@@ -1,0 +1,36 @@
+.work-accomplishment-container {
+    margin-bottom: 36px;
+    margin-right: 24px;
+    margin-left: 24px;
+}
+
+.form-label-accomplishments {
+    font-size: 14px;
+    color: var(--chakra-colors-gray-400);
+}
+
+.add-button-accomplishments {
+    /* background-color: var(--chakra-colors-green-200); */
+    border-radius: 10px;
+    margin-left: 8px;
+    margin-top: 28px;
+    /* height: 330px; */
+}
+
+.edit-button {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    margin-left: 8px;
+}
+
+.view-button {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    margin-left: 8px;
+}
+
+.card-heading {
+    margin-bottom: 8px;
+    color: var(--chakra-colors-gray-500);
+}
+
