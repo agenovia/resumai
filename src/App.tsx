@@ -12,7 +12,13 @@ function App() {
 
   const handleSubmit = (values: WorkHistoryFormValues) => {
     setModalOpen(false);
-    setWorkHistory([...workHistory, values]);
+    const sortedWorkHistory = [...workHistory, values].sort((a, b) => {
+      if (Date.parse(a.startDate) === Date.parse(b.startDate)) {
+        return 0;
+      }
+      return a.startDate > b.startDate ? -1 : 1;
+    });
+    setWorkHistory(sortedWorkHistory);
   };
 
   const saveHistory = (items: WorkHistoryFormValues[]) => {
