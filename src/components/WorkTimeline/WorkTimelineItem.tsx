@@ -22,6 +22,12 @@ import WorkHistoryFormValues, {
 } from "../WorkHistory/types";
 import "./styles.css";
 
+interface WorkTimelineItemProps extends WorkTimelineCardProps {
+  workHistoryItem: WorkHistoryFormValues;
+  expanded: boolean;
+  delayMultiplier: number;
+}
+
 interface WorkTimelineCardProps {
   workHistoryItem: WorkHistoryFormValues;
   onChatClick: (
@@ -133,7 +139,7 @@ const WorkTimelineItem = ({
   delayMultiplier,
   workHistoryItem,
   onChatClick,
-}: WorkTimelineCardProps) => {
+}: WorkTimelineItemProps) => {
   const [isExpanded, setExpanded] = useState(expanded);
   const isCurrent = workHistoryItem.endDate.length === 0;
 
