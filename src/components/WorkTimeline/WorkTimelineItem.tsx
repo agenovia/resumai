@@ -15,12 +15,11 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { FaCommentDots } from "react-icons/fa";
-import { GoDot, GoDotFill } from "react-icons/go";
 import { FaBuilding, FaIdBadge } from "react-icons/fa6";
+import { GoDot, GoDotFill } from "react-icons/go";
 
 import WorkHistoryFormValues from "../WorkHistory/types";
 import "./styles.css";
-import { get } from "react-hook-form";
 
 interface Props {
   workHistoryItem: WorkHistoryFormValues;
