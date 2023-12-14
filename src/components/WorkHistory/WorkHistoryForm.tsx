@@ -16,7 +16,7 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { UseFormReset, useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import WorkAccomplishmentsList from "./WorkAccomplishmentsList";
 import { placeholders } from "./constants";
 import WorkHistoryFormValues, { WorkAccomplishment } from "./types";

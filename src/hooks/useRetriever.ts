@@ -48,21 +48,21 @@ const useRetriever = ({
     )
   );
 
-  const responsibilities = workHistory.flatMap((v) =>
-    v.description.map(
-      (a) =>
-        new Document({
-          pageContent: a,
-          metadata: {
-            company: v.company,
-            jobTitle: v.jobTitle,
-            startDate: v.startDate,
-            endDate: v.endDate,
-            section: "responsibilities",
-          },
-        })
-    )
-  );
+  // const responsibilities = workHistory.flatMap((v) =>
+  //   v.description.map(
+  //     (a) =>
+  //       new Document({
+  //         pageContent: a,
+  //         metadata: {
+  //           company: v.company,
+  //           jobTitle: v.jobTitle,
+  //           startDate: v.startDate,
+  //           endDate: v.endDate,
+  //           section: "responsibilities",
+  //         },
+  //       })
+  //   )
+  // );
 
   // const docs = [...responsibilities, ...accomplishments];
   const docs = [...accomplishments];
