@@ -27,24 +27,6 @@ interface Props {
   onSubmit: (values: WorkHistoryFormValues) => void;
 }
 
-// const parseDate = (date: string) => {
-//   const [month, day, year] = date.split("-");
-//   return new Date(parseInt(year), parseInt(month), parseInt(day));
-// };
-
-// const startAfterEnd = (startDate: string, endDate: string) => {
-//   if (endDate.length === 0) return false;
-//   return parseDate(startDate) < parseDate(endDate);
-// };
-
-// const startIsToday = (startDate: string) => {
-//   return parseDate(startDate) >= new Date();
-// };
-
-// const startIsFuture = (startDate: string) => {
-//   return parseDate(startDate) > new Date();
-// };
-
 const WorkHistoryForm = ({ isOpen, onClose, onSubmit }: Props) => {
   const [isCurrentJob, setCurrentJob] = useState(false);
   const [endDate, setEndDate] = useState<string>("");
@@ -93,7 +75,13 @@ const WorkHistoryForm = ({ isOpen, onClose, onSubmit }: Props) => {
                 event?.preventDefault();
                 setCurrentJob(false);
                 handleReset();
-                onSubmit(data);
+                const _data = {
+                  ...data,
+                  description: (data.description as unknown as string)
+                    .split(/(?:(?:(?<!=\w)-(?!\w))|\n|•|○|⦿|⦾|‣|⁃)/)
+                    .filter((x) => x.trim().length > 0),
+                };
+                onSubmit(_data);
               })}
             >
               <FormControl isRequired={true} mb={4}>

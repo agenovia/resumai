@@ -35,9 +35,6 @@ const WorkTimelineCard = ({
   workHistoryItem,
   onChatClick,
 }: WorkTimelineCardProps) => {
-  const description = workHistoryItem.description
-    .split(/(?:(?:(?<!=\w)-(?!\w))|\n|•|○|⦿|⦾|‣|⁃)/)
-    .filter((x) => x.trim().length > 0);
   const hasAccomplishments = workHistoryItem.accomplishments.length > 0;
   return (
     <Box className="main-card" overflow="hidden">
@@ -87,7 +84,7 @@ const WorkTimelineCard = ({
               <Text>Responsibilities</Text>
             </Heading>
             <VStack className="vertical-stack" spacing={2} align="left">
-              {description.map((v, idx) => (
+              {workHistoryItem.description.map((v, idx) => (
                 <Text key={idx}>• {v.trim()}</Text>
               ))}
             </VStack>
