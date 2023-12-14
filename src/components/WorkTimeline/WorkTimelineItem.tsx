@@ -15,7 +15,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { FaBuilding, FaCommentDots, FaIdBadge } from "react-icons/fa6";
-import { GoDot, GoDotFill } from "react-icons/go";
+import { GoDot, GoDotFill, GoTrash } from "react-icons/go";
 
 import WorkHistoryFormValues from "../WorkHistory/types";
 import "./styles.css";
@@ -24,6 +24,7 @@ interface WorkTimelineItemProps extends WorkTimelineCardProps {
   workHistoryItem: WorkHistoryFormValues;
   expanded: boolean;
   delayMultiplier: number;
+  onDelete: (entry: WorkHistoryFormValues) => void;
 }
 
 interface WorkTimelineCardProps {
@@ -114,6 +115,7 @@ const WorkTimelineItem = ({
   delayMultiplier,
   workHistoryItem,
   onChatClick,
+  onDelete,
 }: WorkTimelineItemProps) => {
   const [isExpanded, setExpanded] = useState(expanded);
   const isCurrent = workHistoryItem.endDate.length === 0;
@@ -198,10 +200,18 @@ const WorkTimelineItem = ({
               direction="row"
               shadow="md"
             >
-              <WorkTimelineCard
-                workHistoryItem={workHistoryItem}
-                onChatClick={onChatClick}
-              />
+              <VStack spacing={2}>
+                <WorkTimelineCard
+                  workHistoryItem={workHistoryItem}
+                  onChatClick={onChatClick}
+                />
+                <IconButton
+                  aria-label="Delete this item"
+                  title="Delete this item"
+                  icon={<GoTrash />}
+                  onClick={() => onDelete(workHistoryItem)}
+                />
+              </VStack>
             </Flex>
           </Flex>
         </HStack>

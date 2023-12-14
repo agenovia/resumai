@@ -52,7 +52,7 @@ function App() {
         onSubmit={handleSubmit}
       />
       <AddWorkHistoryButton onAddWorkHistory={() => setModalOpen(true)} />
-      <WorkTimeline workHistory={workHistory} />
+      <WorkTimeline workHistory={workHistory} onDelete={handleDelete} />
     </VStack>
   );
 }
