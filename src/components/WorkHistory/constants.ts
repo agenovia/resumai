@@ -24,11 +24,15 @@ that were pivotal to this accomplishment.\
   \n\ne.g., leadership, project management, conflict management, web development, python, java, etc.`,
   accomplishmentHeadline: `e.g., Executed pricing optimization strategies, \
 resulting in an 18% profit margin boost`,
+  personalNote: `Add a personal note about this job that might not be reflected by the job title.\n\n\
+Examples:\n"I was the first employee at this startup, and I was responsible for building the entire product from scratch."\n
+"I wore many hats at this job and fulfilled the role of a product manager, a designer, and a developer."`,
 };
 
 export const limits = {
   accomplishmentFormHeadline: 200,
-  accomplishmentFormContext: 1500,
+  accomplishmentFormContext: 2000,
   accomplishmentFormSkills: 100,
   workFormDescription: 1500,
+  personalNote: 150,
 };

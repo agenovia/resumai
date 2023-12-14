@@ -1,12 +1,7 @@
 import {
-  Badge,
   Box,
-  Card,
-  CardBody,
-  CardHeader,
   Flex,
   HStack,
-  Heading,
   Icon,
   IconButton,
   SlideFade,
@@ -14,101 +9,20 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { FaBuilding, FaCommentDots, FaIdBadge } from "react-icons/fa6";
-import { GoDot, GoDotFill, GoTrash } from "react-icons/go";
+import { GoDot, GoDotFill, GoTrash, GoPencil } from "react-icons/go";
 
 import WorkHistoryFormValues from "../WorkHistory/types";
 import "./styles.css";
+import WorkTimelineCard from "./WorkTimelineCard";
 
-interface WorkTimelineItemProps extends WorkTimelineCardProps {
+interface Props {
   workHistoryItem: WorkHistoryFormValues;
   expanded: boolean;
   delayMultiplier: number;
   onDelete: (entry: WorkHistoryFormValues) => void;
-}
-
-interface WorkTimelineCardProps {
-  workHistoryItem: WorkHistoryFormValues;
+  onEdit: (entry: WorkHistoryFormValues) => void;
   onChatClick: (workHistory: WorkHistoryFormValues[]) => void;
 }
-
-const WorkTimelineCard = ({
-  workHistoryItem,
-  onChatClick,
-}: WorkTimelineCardProps) => {
-  const hasAccomplishments = workHistoryItem.accomplishments.length > 0;
-  return (
-    <Box className="main-card" overflow="hidden">
-      <Card>
-        <VStack>
-          <CardHeader>
-            <VStack spacing={2}>
-              <HStack spacing={2}>
-                <Badge
-                  fontSize="xs"
-                  variant="outline"
-                  bgColor="papayawhip"
-                  rounded="full"
-                  p={3}
-                >
-                  <HStack>
-                    <Icon as={FaBuilding} />
-                    <Text>{workHistoryItem.company}</Text>
-                  </HStack>
-                </Badge>
-                <Badge
-                  fontSize="xs"
-                  variant="solid"
-                  bgColor="tomato"
-                  rounded="full"
-                  p={3}
-                >
-                  <HStack>
-                    <Icon as={FaIdBadge} />
-                    <Text>{workHistoryItem.jobTitle}</Text>
-                  </HStack>
-                </Badge>
-
-                <IconButton
-                  aria-label="Chat about this job"
-                  title="Chat about this job"
-                  rounded="full"
-                  bgColor="transparent"
-                  icon={<FaCommentDots />}
-                  onClick={() => onChatClick([workHistoryItem])}
-                />
-              </HStack>
-            </VStack>
-          </CardHeader>
-          <CardBody textAlign="left" flexDirection="row" w="100%">
-            <Heading className="headings" size="sm">
-              <Text>Responsibilities</Text>
-            </Heading>
-            <VStack className="vertical-stack" spacing={2} align="left">
-              {workHistoryItem.description.map((v, idx) => (
-                <Text key={idx}>• {v.trim()}</Text>
-              ))}
-            </VStack>
-            {hasAccomplishments && (
-              <>
-                <Heading className="headings" size="sm">
-                  <Text>Accomplishments</Text>
-                </Heading>
-                <VStack className="vertical-stack" spacing={2} align="left">
-                  {workHistoryItem.accomplishments.map((v, idx) => (
-                    <Box key={idx} outlineColor="black" outline={2}>
-                      <Text>• {v.headline.trim()}</Text>
-                    </Box>
-                  ))}
-                </VStack>
-              </>
-            )}
-          </CardBody>
-        </VStack>
-      </Card>
-    </Box>
-  );
-};
 
 const WorkTimelineItem = ({
   expanded,
@@ -116,7 +30,8 @@ const WorkTimelineItem = ({
   workHistoryItem,
   onChatClick,
   onDelete,
-}: WorkTimelineItemProps) => {
+  onEdit,
+}: Props) => {
   const [isExpanded, setExpanded] = useState(expanded);
   const isCurrent = workHistoryItem.endDate.length === 0;
 
@@ -205,12 +120,26 @@ const WorkTimelineItem = ({
                   workHistoryItem={workHistoryItem}
                   onChatClick={onChatClick}
                 />
-                <IconButton
-                  aria-label="Delete this item"
-                  title="Delete this item"
-                  icon={<GoTrash />}
-                  onClick={() => onDelete(workHistoryItem)}
-                />
+                <HStack spacing={2}>
+                  <IconButton
+                    aria-label="Delete this entry"
+                    title="Delete this entry"
+                    icon={<GoTrash />}
+                    onClick={() => onDelete(workHistoryItem)}
+                    rounded="full"
+                    colorScheme="red"
+                    size="xs"
+                  />
+                  <IconButton
+                    aria-label="Edit this entry"
+                    title="Edit this entry"
+                    icon={<GoPencil />}
+                    onClick={() => onEdit(workHistoryItem)}
+                    rounded="full"
+                    size="xs"
+                    colorScheme="orange"
+                  />
+                </HStack>
               </VStack>
             </Flex>
           </Flex>

@@ -16,8 +16,8 @@
 
 .main-card {
     border-radius: 24px;
-    width: inherit;
-    flex-direction: row;
+    /* width: inherit; */
+    /* flex-direction: row; */
     margin-top: 8px;
     margin-bottom: 8px;
 }

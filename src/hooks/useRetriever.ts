@@ -34,13 +34,13 @@ const useRetriever = ({
     v.accomplishments.map(
       (a) =>
         new Document({
-          pageContent: a.headline,
+          pageContent: a.context,
           metadata: {
             company: v.company,
             jobTitle: v.jobTitle,
             startDate: v.startDate,
             endDate: v.endDate,
-            context: a.context,
+            headline: a.headline,
             skills: a.skills,
             section: "accomplishments",
           },
@@ -64,7 +64,8 @@ const useRetriever = ({
     )
   );
 
-  const docs = [...responsibilities, ...accomplishments];
+  // const docs = [...responsibilities, ...accomplishments];
+  const docs = [...accomplishments];
 
   const fetchRetriever = async () => {
     const vectorStore = await MemoryVectorStore.fromDocuments(

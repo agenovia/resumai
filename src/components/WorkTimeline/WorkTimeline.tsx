@@ -13,9 +13,10 @@ import WorkTimelineItem from "./WorkTimelineItem";
 interface Props {
   workHistory: WorkHistoryFormValues[];
   onDelete: (entry: WorkHistoryFormValues) => void;
+  onEdit: (entry: WorkHistoryFormValues) => void;
 }
 
-const WorkTimeline = ({ workHistory, onDelete }: Props) => {
+const WorkTimeline = ({ workHistory, onDelete, onEdit }: Props) => {
   const [selectedHistory, setSelectedHistory] = useState<
     WorkHistoryFormValues[]
   >([]);
@@ -38,6 +39,7 @@ const WorkTimeline = ({ workHistory, onDelete }: Props) => {
           delayMultiplier={Math.max(1 / (idx + 1), 0.1)}
           onChatClick={handleChatClick}
           onDelete={onDelete}
+          onEdit={onEdit}
         />
       ))}
 
