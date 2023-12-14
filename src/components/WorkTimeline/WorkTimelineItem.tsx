@@ -17,9 +17,7 @@ import { useEffect, useState } from "react";
 import { FaBuilding, FaCommentDots, FaIdBadge } from "react-icons/fa6";
 import { GoDot, GoDotFill } from "react-icons/go";
 
-import WorkHistoryFormValues, {
-  WorkAccomplishment,
-} from "../WorkHistory/types";
+import WorkHistoryFormValues from "../WorkHistory/types";
 import "./styles.css";
 
 interface WorkTimelineItemProps extends WorkTimelineCardProps {
@@ -30,10 +28,7 @@ interface WorkTimelineItemProps extends WorkTimelineCardProps {
 
 interface WorkTimelineCardProps {
   workHistoryItem: WorkHistoryFormValues;
-  onChatClick: (
-    accomplishments: WorkAccomplishment[],
-    metadata: WorkHistoryFormValues
-  ) => void;
+  onChatClick: (workHistory: WorkHistoryFormValues[]) => void;
 }
 
 const WorkTimelineCard = ({
@@ -75,6 +70,15 @@ const WorkTimelineCard = ({
                     <Text>{workHistoryItem.jobTitle}</Text>
                   </HStack>
                 </Badge>
+
+                <IconButton
+                  aria-label="Chat about this job"
+                  title="Chat about this job"
+                  rounded="full"
+                  bgColor="transparent"
+                  icon={<FaCommentDots />}
+                  onClick={() => onChatClick([workHistoryItem])}
+                />
               </HStack>
             </VStack>
           </CardHeader>
@@ -90,38 +94,12 @@ const WorkTimelineCard = ({
             {hasAccomplishments && (
               <>
                 <Heading className="headings" size="sm">
-                  <HStack>
-                    <Text>Accomplishments</Text>
-
-                    <IconButton
-                      aria-label="Chat about any accomplishment"
-                      title="Chat about any accomplishment"
-                      rounded="full"
-                      bgColor="transparent"
-                      icon={<FaCommentDots />}
-                      onClick={() =>
-                        onChatClick(
-                          workHistoryItem.accomplishments,
-                          workHistoryItem
-                        )
-                      }
-                    />
-                  </HStack>
+                  <Text>Accomplishments</Text>
                 </Heading>
                 <VStack className="vertical-stack" spacing={2} align="left">
                   {workHistoryItem.accomplishments.map((v, idx) => (
                     <Box key={idx} outlineColor="black" outline={2}>
-                      <HStack spacing={2}>
-                        <Text>• {v.headline.trim()}</Text>
-                        <IconButton
-                          aria-label="Chat about this accomplishment"
-                          title="Chat about this accomplishment"
-                          rounded="full"
-                          bgColor="transparent"
-                          icon={<FaCommentDots />}
-                          onClick={() => onChatClick([v], workHistoryItem)}
-                        />
-                      </HStack>
+                      <Text>• {v.headline.trim()}</Text>
                     </Box>
                   ))}
                 </VStack>

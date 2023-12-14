@@ -1,30 +1,27 @@
 import {
   Box,
   Center,
-  Heading,
   IconButton,
   Input,
   InputGroup,
   InputRightElement,
-  Text,
   VStack,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { LuSend } from "react-icons/lu";
-import AIClient from "../../services/aiClient";
-import { WorkAccomplishment } from "../WorkHistory/types";
+import ChatClient from "../../services/chatClient";
+import WorkHistoryFormValues from "../WorkHistory/types";
 import ChatMessage from "./ChatMessage";
 
 interface Props {
-  workAccomplishments: WorkAccomplishment[];
-  topic: string;
+  workHistory: WorkHistoryFormValues[];
 }
 
-const ChatBox = ({ workAccomplishments, topic }: Props) => {
+const ChatBox = ({ workHistory }: Props) => {
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [query, setQuery] = useState("");
-  const [client, setClient] = useState<AIClient>(
-    new AIClient(import.meta.env.VITE_OPENAI_KEY, workAccomplishments)
+  const [client, setClient] = useState<ChatClient>(
+    new ChatClient(import.meta.env.VITE_OPENAI_KEY, workHistory)
   );
   const splashMessage = `Hi, I'm ResumAI. I can help you answer questions you may \
   have about the client's work history. You can try asking simple questions like "What are \
@@ -37,20 +34,21 @@ const ChatBox = ({ workAccomplishments, topic }: Props) => {
   }, []);
 
   useEffect(() => {
-    setClient(
-      new AIClient(import.meta.env.VITE_OPENAI_KEY, workAccomplishments)
-    );
-  }, [workAccomplishments]);
+    setClient(new ChatClient(import.meta.env.VITE_OPENAI_KEY, workHistory));
+  }, [workHistory]);
 
   useEffect(() => {
     if (chatHistory.length === 0) return;
-    if (chatHistory[chatHistory.length - 1].from === "system") return;
-    const query = chatHistory[chatHistory.length - 1].text;
+    const lastMessage = chatHistory[chatHistory.length - 1];
+    if (lastMessage.from === "system") return;
+    const query = lastMessage.text;
     const getDocs = async () => {
-      const response = await client.ask(query);
-      const result = response.reduce((acc, v) => acc + v.pageContent, "");
-      handleSystemMessage(result);
+      const response = await client.getRelevantDocuments(query);
+      const result = response?.reduce((acc, v) => acc + v.pageContent, "");
+      return result;
     };
+    // getDocs().then((r) => handleSystemMessage(r ?? ""));
+    // console.log(client.getRetriever().then((x) => x));
     getDocs();
   }, [chatHistory]);
 
@@ -89,9 +87,9 @@ const ChatBox = ({ workAccomplishments, topic }: Props) => {
           overflowY="auto"
           h="50vh"
         >
-          <Heading size="md" textAlign="center" p={2}>
+          {/* <Heading size="md" textAlign="center" p={2}>
             <Text p={2}>Topic: {topic}</Text>
-          </Heading>
+          </Heading> */}
           {chatHistory.map((message) => (
             <ChatMessage message={message} key={message.seq} />
           ))}

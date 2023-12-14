@@ -14,10 +14,8 @@ class ChatClient {
   private client: OpenAI;
   private embeddings: OpenAIEmbeddings;
   private splitter: RecursiveCharacterTextSplitter;
-  private retriever: ScoreThresholdRetriever<MemoryVectorStore> | null;
 
   constructor(apiKey: string, workHistory: WorkHistoryFormValues[]) {
-    this.retriever = null;
     this.apiKey = apiKey;
     const settings = { openAIApiKey: apiKey };
     this.client = new OpenAI(settings);
@@ -27,24 +25,24 @@ class ChatClient {
       chunkSize: 500,
       chunkOverlap: 100,
     });
-    // this.store = new MemoryVectorStore(this.embeddings);
-    this.setRetriever();
   }
 
-  private async setRetriever() {
+  async getRetriever() {
     const docs = [
-      ...(await this.getAccomplishments()),
+      //   ...(await this.getAccomplishments()),
       ...(await this.getResponsibilities()),
     ];
     const store = await MemoryVectorStore.fromDocuments(docs, this.embeddings);
-    this.retriever = ScoreThresholdRetriever.fromVectorStore(store, {
+    const retriever = await ScoreThresholdRetriever.fromVectorStore(store, {
       minSimilarityScore: 0.8,
       maxK: 100,
       kIncrement: 2,
     });
+    console.log("got retriever");
+    return retriever;
   }
 
-  private async getResponsibilities() {
+  async getResponsibilities() {
     const docs =
       this.workHistory.map(
         (v) =>
@@ -59,11 +57,11 @@ class ChatClient {
           })
       ) ?? [];
 
-    const ret = this.splitter.splitDocuments(docs).then((x) => x);
+    const ret = await this.splitter.splitDocuments(docs);
     return ret;
   }
 
-  private async getAccomplishments() {
+  async getAccomplishments() {
     const docs = this.workHistory.flatMap(
       (w: WorkHistoryFormValues) =>
         w.accomplishments.flatMap(
@@ -87,7 +85,14 @@ class ChatClient {
   }
 
   async getRelevantDocuments(query: string) {
-    await this.retriever?.getRelevantDocuments(query);
+    console.log("getting relevant docs");
+    const retriever = await this.getRetriever();
+    const response = await retriever.getRelevantDocuments(query);
+    return response;
+  }
+
+  async ask(query: string) {
+    return await this.getRelevantDocuments(query);
   }
 }
 

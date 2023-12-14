@@ -7,9 +7,7 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import ChatBox from "../Chat/ChatBox";
-import WorkHistoryFormValues, {
-  WorkAccomplishment,
-} from "../WorkHistory/types";
+import WorkHistoryFormValues from "../WorkHistory/types";
 import WorkTimelineItem from "./WorkTimelineItem";
 
 interface Props {
@@ -17,27 +15,16 @@ interface Props {
 }
 
 const WorkTimeline = ({ workHistory }: Props) => {
-  const [selectedAccomplishments, setSelectedAccomplishments] = useState<
-    WorkAccomplishment[]
+  const [selectedHistory, setSelectedHistory] = useState<
+    WorkHistoryFormValues[]
   >([]);
-  const [topic, setTopic] = useState("");
 
-  const handleChatClick = (
-    accomplishments: WorkAccomplishment[],
-    metadata: WorkHistoryFormValues
-  ) => {
-    setSelectedAccomplishments(accomplishments);
-    if (accomplishments.length === 1) {
-      setTopic(accomplishments[0].headline);
-    } else {
-      setTopic(
-        `Aaron's accomplishments as a ${metadata.jobTitle} at ${metadata.company}`
-      );
-    }
+  const handleChatClick = (workHistory: WorkHistoryFormValues[]) => {
+    setSelectedHistory(workHistory);
   };
 
   const handleCloseChat = () => {
-    setSelectedAccomplishments([]);
+    setSelectedHistory([]);
   };
 
   return (
@@ -56,7 +43,7 @@ const WorkTimeline = ({ workHistory }: Props) => {
         placement="bottom"
         size="lg"
         onClose={handleCloseChat}
-        isOpen={selectedAccomplishments.length > 0}
+        isOpen={selectedHistory.length > 0}
         closeOnOverlayClick
       >
         <DrawerOverlay />
@@ -69,10 +56,7 @@ const WorkTimeline = ({ workHistory }: Props) => {
           bgColor="transparent"
         >
           <VStack>
-            <ChatBox
-              workAccomplishments={selectedAccomplishments}
-              topic={topic}
-            />
+            <ChatBox workHistory={selectedHistory} />
           </VStack>
         </DrawerContent>
       </Drawer>
