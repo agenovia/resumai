@@ -36,7 +36,7 @@ const WorkTimeline = ({ workHistory, onDelete, onEdit }: Props) => {
           expanded={false}
           key={idx}
           workHistoryItem={item}
-          delayMultiplier={Math.max(1 / (idx + 1), 0.1)}
+          delayMultiplier={Math.max(0.6 / (idx + 1), 0.1)}
           onChatClick={handleChatClick}
           onDelete={onDelete}
           onEdit={onEdit}
