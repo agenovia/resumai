@@ -1,32 +1,70 @@
-import { Grid, GridItem } from "@chakra-ui/react";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerOverlay,
+  Flex,
+  VStack,
+} from "@chakra-ui/react";
+import { useState } from "react";
+import ChatBox from "../Chat/ChatBox";
 import WorkHistoryFormValues from "../WorkHistory/types";
 import WorkTimelineItem from "./WorkTimelineItem";
 
 interface Props {
   workHistory: WorkHistoryFormValues[];
+  onDelete: (entry: WorkHistoryFormValues) => void;
+  onEdit: (entry: WorkHistoryFormValues) => void;
 }
 
-const WorkTimeline = ({ workHistory }: Props) => {
-  const sortedWorkHistory = workHistory.sort((a, b) => {
-    if (Date.parse(a.startDate) === Date.parse(b.startDate)) {
-      return 0;
-    }
-    return a.startDate > b.startDate ? -1 : 1;
-  });
+const WorkTimeline = ({ workHistory, onDelete, onEdit }: Props) => {
+  const [selectedHistory, setSelectedHistory] = useState<
+    WorkHistoryFormValues[]
+  >([]);
+
+  const handleChatClick = (workHistory: WorkHistoryFormValues[]) => {
+    setSelectedHistory(workHistory);
+  };
+
+  const handleCloseChat = () => {
+    setSelectedHistory([]);
+  };
+
   return (
-    <Grid h="100%" templateColumns="1fr" m={4} pl={10} pr={10}>
-      <GridItem />
-      <GridItem>
-        {sortedWorkHistory.map((item, idx) => (
-          <WorkTimelineItem
-            expanded={false}
-            key={idx}
-            workHistoryItem={item}
-            delayMultiplier={1 / (idx + 1)}
-          />
-        ))}
-      </GridItem>
-    </Grid>
+    <Flex direction="column" align="left" m={4} pl={10} pr={10}>
+      {workHistory.map((item, idx) => (
+        <WorkTimelineItem
+          expanded={false}
+          key={idx}
+          workHistoryItem={item}
+          delayMultiplier={Math.max(+(0.75 / (idx + 1)).toFixed(2), 0.05)}
+          onChatClick={handleChatClick}
+          onDelete={onDelete}
+          onEdit={onEdit}
+        />
+      ))}
+
+      <Drawer
+        placement="bottom"
+        size="lg"
+        onClose={handleCloseChat}
+        isOpen={selectedHistory.length > 0}
+        closeOnOverlayClick
+      >
+        <DrawerOverlay />
+        <DrawerContent
+          pb={10}
+          pt={10}
+          pl={4}
+          pr={4}
+          borderRadius={10}
+          bgColor="transparent"
+        >
+          <VStack>
+            <ChatBox workHistory={selectedHistory} />
+          </VStack>
+        </DrawerContent>
+      </Drawer>
+    </Flex>
   );
 };
 

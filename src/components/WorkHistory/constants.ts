@@ -1,5 +1,5 @@
 export const placeholders = {
-  workDescription: `Describe the work you performed in this role.\
+  workResponsibilities: `Describe the work you performed in this role.\
     \n\nExamples:\
     \n- Coordinated project timelines, allocated resources, and ensured that project objectives are met within specified deadlines.\
     \n- Managed a team of 5 developers, 2 designers, and 3 QA engineers.\
@@ -24,11 +24,18 @@ that were pivotal to this accomplishment.\
   \n\ne.g., leadership, project management, conflict management, web development, python, java, etc.`,
   accomplishmentHeadline: `e.g., Executed pricing optimization strategies, \
 resulting in an 18% profit margin boost`,
+  personalNote: `Add a personal note about this job that you want people to know. This will be presented as a splash message in the chatbox. \
+Have fun and flaunt your style! \n\n\
+Examples:\n"I was the first employee at this startup, and I was responsible for building the entire product from scratch 😎"\n\
+"I wore many hats at this job and fulfilled the role of a product manager, a designer, and a developer ⛑️ 🤠 🎩"\n\
+"I was 'chef' 👩‍🍳 to my close colleagues because I was always cooking up new ideas and projects; by the same token, \
+our department was a Michelin star restaurant! 🍜" `,
 };
 
 export const limits = {
   accomplishmentFormHeadline: 200,
-  accomplishmentFormContext: 1500,
+  accomplishmentFormContext: 2000,
   accomplishmentFormSkills: 100,
   workFormDescription: 1500,
+  personalNote: 150,
 };

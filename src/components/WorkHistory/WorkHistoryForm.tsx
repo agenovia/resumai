@@ -15,7 +15,7 @@ import {
   Text,
   Textarea,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import WorkAccomplishmentsList from "./WorkAccomplishmentsList";
 import { placeholders } from "./constants";
@@ -24,30 +24,20 @@ import WorkHistoryFormValues, { WorkAccomplishment } from "./types";
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (values: WorkHistoryFormValues) => void;
+  onSubmit: (values: WorkHistoryFormValues, replaceIndex?: number) => void;
+  workHistory?: WorkHistoryFormValues;
+  replaceIndex?: number;
 }
 
-// const parseDate = (date: string) => {
-//   const [month, day, year] = date.split("-");
-//   return new Date(parseInt(year), parseInt(month), parseInt(day));
-// };
-
-// const startAfterEnd = (startDate: string, endDate: string) => {
-//   if (endDate.length === 0) return false;
-//   return parseDate(startDate) < parseDate(endDate);
-// };
-
-// const startIsToday = (startDate: string) => {
-//   return parseDate(startDate) >= new Date();
-// };
-
-// const startIsFuture = (startDate: string) => {
-//   return parseDate(startDate) > new Date();
-// };
-
-const WorkHistoryForm = ({ isOpen, onClose, onSubmit }: Props) => {
+const WorkHistoryForm = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  workHistory,
+  replaceIndex,
+}: Props) => {
   const [isCurrentJob, setCurrentJob] = useState(false);
-  const [endDate, setEndDate] = useState<string>("");
+  const [currentEndDate, setEndDate] = useState<string>("");
 
   const {
     handleSubmit,
@@ -55,6 +45,7 @@ const WorkHistoryForm = ({ isOpen, onClose, onSubmit }: Props) => {
     reset,
     control,
     getValues,
+    setValue,
     formState: { isSubmitting },
   } = useForm<WorkHistoryFormValues>();
   const { replace: replaceAccomplishment, remove: removeAccomplishments } =
@@ -62,6 +53,27 @@ const WorkHistoryForm = ({ isOpen, onClose, onSubmit }: Props) => {
       control,
       name: "accomplishments",
     });
+
+  useEffect(() => {
+    if (!workHistory) return;
+
+    const existingHistory = {
+      ...workHistory,
+      description: workHistory.description
+        .map((x) => "• " + x.trim())
+        .join("\n"),
+    };
+    Object.entries(existingHistory).map(([key, value]) =>
+      setValue(key as keyof WorkHistoryFormValues, value)
+    );
+    if (workHistory.endDate.length === 0) {
+      setCurrentJob(true);
+      setEndDate("");
+    } else {
+      setCurrentJob(false);
+      setEndDate(workHistory.endDate);
+    }
+  }, [workHistory]);
 
   const handleReset = () => {
     reset();
@@ -74,10 +86,17 @@ const WorkHistoryForm = ({ isOpen, onClose, onSubmit }: Props) => {
     replaceAccomplishment(entries);
   };
 
+  const handleClose = () => {
+    if (replaceIndex !== undefined) {
+      handleReset();
+    }
+    onClose();
+  };
+
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       closeOnOverlayClick={false}
       scrollBehavior="inside"
     >
@@ -93,7 +112,13 @@ const WorkHistoryForm = ({ isOpen, onClose, onSubmit }: Props) => {
                 event?.preventDefault();
                 setCurrentJob(false);
                 handleReset();
-                onSubmit(data);
+                const _data = {
+                  ...data,
+                  description: (data.description as unknown as string)
+                    .split(/(?:(?:(?<!=\w)-(?!\w))|\n|•|○|⦿|⦾|‣|⁃)/)
+                    .filter((x) => x.trim().length > 0),
+                };
+                onSubmit(_data, replaceIndex);
               })}
             >
               <FormControl isRequired={true} mb={4}>
@@ -104,12 +129,13 @@ const WorkHistoryForm = ({ isOpen, onClose, onSubmit }: Props) => {
                   mb={4}
                 />
                 <FormLabel>Job Title</FormLabel>
-                <Input
+                <Textarea
                   id="jobTitle"
                   {...register("jobTitle", { required: true })}
                   mb={4}
                 />
               </FormControl>
+
               <HStack mb={4}>
                 <FormControl isRequired={true}>
                   <FormLabel>Start Date</FormLabel>
@@ -127,9 +153,9 @@ const WorkHistoryForm = ({ isOpen, onClose, onSubmit }: Props) => {
                     {...register("endDate", { required: !isCurrentJob })}
                     type="date"
                     isDisabled={isCurrentJob}
-                    value={endDate}
-                    onChange={(event) => setEndDate(event.target.value)}
                     mb={2}
+                    onChange={(event) => setEndDate(event.target.value)}
+                    value={currentEndDate}
                   />
                 </FormControl>
                 <FormControl>
@@ -146,13 +172,23 @@ const WorkHistoryForm = ({ isOpen, onClose, onSubmit }: Props) => {
                 </FormControl>
               </HStack>
               <FormControl isRequired={true} mb={4}>
-                <FormLabel>Description</FormLabel>
+                <FormLabel>Responsibilities</FormLabel>
                 <Textarea
                   id="description"
                   {...register("description", { required: true })}
                   mb={2}
-                  placeholder={placeholders.workDescription}
+                  placeholder={placeholders.workResponsibilities}
                   height="200px"
+                />
+              </FormControl>
+              <FormControl mb={4}>
+                <FormLabel>Personal Note</FormLabel>
+                <Textarea
+                  id="personalNote"
+                  {...register("personalNote", { required: true })}
+                  mb={4}
+                  placeholder={placeholders.personalNote}
+                  minH="200px"
                 />
               </FormControl>
               <FormControl mb={4}>
@@ -166,18 +202,29 @@ const WorkHistoryForm = ({ isOpen, onClose, onSubmit }: Props) => {
               </FormControl>
               <FormControl mb={4}>
                 <HStack justifyContent="space-between">
-                  <Button
-                    colorScheme="green"
-                    isLoading={isSubmitting}
-                    type="submit"
-                  >
-                    Submit
-                  </Button>
+                  {replaceIndex !== undefined ? (
+                    <Button
+                      colorScheme="orange"
+                      isLoading={isSubmitting}
+                      type="submit"
+                    >
+                      Replace Existing Entry
+                    </Button>
+                  ) : (
+                    <Button
+                      colorScheme="green"
+                      isLoading={isSubmitting}
+                      type="submit"
+                    >
+                      Submit New Entry
+                    </Button>
+                  )}
+
                   <HStack spacing="14px">
                     <Button colorScheme="red" onClick={handleReset}>
                       Reset
                     </Button>
-                    <Button colorScheme="gray" onClick={onClose}>
+                    <Button colorScheme="gray" onClick={handleClose}>
                       Close
                     </Button>
                   </HStack>

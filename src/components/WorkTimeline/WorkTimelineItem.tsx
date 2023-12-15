@@ -1,12 +1,7 @@
 import {
-  Badge,
   Box,
-  Card,
-  CardBody,
-  CardHeader,
   Flex,
   HStack,
-  Heading,
   Icon,
   IconButton,
   SlideFade,
@@ -14,113 +9,28 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { FaCommentDots } from "react-icons/fa";
-import { GoDot, GoDotFill } from "react-icons/go";
-import { FaBuilding, FaIdBadge } from "react-icons/fa6";
+import { GoDot, GoDotFill, GoTrash, GoPencil } from "react-icons/go";
 
 import WorkHistoryFormValues from "../WorkHistory/types";
 import "./styles.css";
-import { get } from "react-hook-form";
+import WorkTimelineCard from "./WorkTimelineCard";
 
 interface Props {
   workHistoryItem: WorkHistoryFormValues;
-  expanded?: boolean;
-  delayMultiplier?: number;
+  expanded: boolean;
+  delayMultiplier: number;
+  onDelete: (entry: WorkHistoryFormValues) => void;
+  onEdit: (entry: WorkHistoryFormValues) => void;
+  onChatClick: (workHistory: WorkHistoryFormValues[]) => void;
 }
-
-const WorkTimelineCard = ({ workHistoryItem }: Props) => {
-  const description = workHistoryItem.description
-    .split(/(?:(?:(?<!=\w)-(?!\w))|\n|•|○|⦿|⦾|‣|⁃)/)
-    .filter((x) => x.trim().length > 0);
-  const hasAccomplishments = workHistoryItem.accomplishments.length > 0;
-  return (
-    <Box className="main-card" overflow="hidden">
-      <Card>
-        <VStack>
-          <CardHeader>
-            <VStack spacing={2}>
-              <HStack spacing={2}>
-                <Badge
-                  fontSize="xs"
-                  variant="outline"
-                  bgColor="papayawhip"
-                  rounded="full"
-                  p={3}
-                >
-                  <HStack>
-                    <Icon as={FaBuilding} />
-                    <Text>{workHistoryItem.company}</Text>
-                  </HStack>
-                </Badge>
-                <Badge
-                  fontSize="xs"
-                  variant="solid"
-                  bgColor="tomato"
-                  rounded="full"
-                  p={3}
-                >
-                  <HStack>
-                    <Icon as={FaIdBadge} />
-                    <Text>{workHistoryItem.jobTitle}</Text>
-                  </HStack>
-                </Badge>
-              </HStack>
-            </VStack>
-          </CardHeader>
-          <CardBody textAlign="left" flexDirection="row" w="100%">
-            <Heading className="headings" size="sm">
-              <Text>Responsibilities</Text>
-            </Heading>
-            <VStack className="vertical-stack" spacing={2} align="left">
-              {description.map((v, idx) => (
-                <Text key={idx}>• {v.trim()}</Text>
-              ))}
-            </VStack>
-            {hasAccomplishments && (
-              <>
-                <Heading className="headings" size="sm">
-                  <HStack>
-                    <Text>Accomplishments</Text>
-                    <IconButton
-                      aria-label="Chat about any accomplishment"
-                      title="Chat about any accomplishment"
-                      rounded="full"
-                      bgColor="transparent"
-                    >
-                      <FaCommentDots />
-                    </IconButton>
-                  </HStack>
-                </Heading>
-                <VStack className="vertical-stack" spacing={2} align="left">
-                  {workHistoryItem.accomplishments.map((v, idx) => (
-                    <Box key={idx} outlineColor="black" outline={2}>
-                      <HStack spacing={2}>
-                        <Text>• {v.headline.trim()}</Text>
-                        <IconButton
-                          aria-label="Chat about this accomplishment"
-                          title="Chat about this accomplishment"
-                          rounded="full"
-                          bgColor="transparent"
-                        >
-                          <FaCommentDots />
-                        </IconButton>
-                      </HStack>
-                    </Box>
-                  ))}
-                </VStack>
-              </>
-            )}
-          </CardBody>
-        </VStack>
-      </Card>
-    </Box>
-  );
-};
 
 const WorkTimelineItem = ({
   expanded,
   delayMultiplier,
   workHistoryItem,
+  onChatClick,
+  onDelete,
+  onEdit,
 }: Props) => {
   const [isExpanded, setExpanded] = useState(expanded);
   const isCurrent = workHistoryItem.endDate.length === 0;
@@ -128,14 +38,12 @@ const WorkTimelineItem = ({
   const getDuration = (startDate: string, endDate: string) => {
     const start = new Date(startDate + "T00:00:00");
     const end = new Date(endDate + "T00:00:00");
-
     const totalMonths =
       end.getMonth() -
       start.getMonth() +
       12 * (end.getFullYear() - start.getFullYear());
     const months = totalMonths % 12;
     const years = Math.floor(totalMonths / 12);
-
     const arr = [];
     if (years === 1) {
       arr.push(`${years} year`);
@@ -180,7 +88,7 @@ const WorkTimelineItem = ({
         <Flex direction="row">
           <HStack spacing={4} pb={1}>
             <Icon as={isCurrent ? GoDotFill : GoDot} position="absolute" />
-            <HStack>
+            <HStack align="baseline">
               {isCurrent ? (
                 <Text as="b" pl="20px">
                   Present
@@ -188,7 +96,7 @@ const WorkTimelineItem = ({
               ) : (
                 <Text pl="20px">{workHistoryItem.endDate}</Text>
               )}
-              <Text fontSize="12px" as="em" pb="1px">
+              <Text fontSize="12px" as="em">
                 {getDuration(
                   workHistoryItem.startDate,
                   workHistoryItem.endDate
@@ -199,7 +107,7 @@ const WorkTimelineItem = ({
         </Flex>
         <HStack spacing={2}>
           <Flex m={2} w="100%">
-            <Box bgColor="tomato" w="2px" h="inherit" borderRadius={10} />
+            <Box bgColor="tomato" w="2px" h="inherit" rounded="full" />
             <Flex
               className="main-content"
               bg="papayawhip"
@@ -207,16 +115,39 @@ const WorkTimelineItem = ({
               direction="row"
               shadow="md"
             >
-              <WorkTimelineCard workHistoryItem={workHistoryItem} />
+              <VStack spacing={2}>
+                <WorkTimelineCard
+                  workHistoryItem={workHistoryItem}
+                  onChatClick={onChatClick}
+                />
+                <HStack spacing={2}>
+                  <IconButton
+                    aria-label="Delete this entry"
+                    title="Delete this entry"
+                    icon={<GoTrash />}
+                    onClick={() => onDelete(workHistoryItem)}
+                    rounded="full"
+                    colorScheme="red"
+                    size="xs"
+                  />
+                  <IconButton
+                    aria-label="Edit this entry"
+                    title="Edit this entry"
+                    icon={<GoPencil />}
+                    onClick={() => onEdit(workHistoryItem)}
+                    rounded="full"
+                    size="xs"
+                    colorScheme="orange"
+                  />
+                </HStack>
+              </VStack>
             </Flex>
           </Flex>
         </HStack>
         <Flex direction="row">
           <HStack spacing={4} pb={1}>
             <Icon as={GoDot} position="absolute" />
-            <Text as="i" pl="20px">
-              {workHistoryItem.startDate}
-            </Text>
+            <Text pl="20px">{workHistoryItem.startDate}</Text>
           </HStack>
         </Flex>
       </Box>
