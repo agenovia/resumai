@@ -185,10 +185,10 @@ const WorkHistoryForm = ({
                 <FormLabel>Personal Note</FormLabel>
                 <Textarea
                   id="personalNote"
-                  {...register("personalNote", { required: true })}
+                  {...register("personalNote", { required: false })}
                   mb={4}
                   placeholder={placeholders.personalNote}
-                  minH="200px"
+                  minH="160px"
                 />
               </FormControl>
               <FormControl mb={4}>
@@ -219,14 +219,21 @@ const WorkHistoryForm = ({
                       Submit New Entry
                     </Button>
                   )}
-
                   <HStack spacing="14px">
-                    <Button colorScheme="red" onClick={handleReset}>
-                      Reset
-                    </Button>
-                    <Button colorScheme="gray" onClick={handleClose}>
-                      Close
-                    </Button>
+                    {replaceIndex !== undefined ? (
+                      <Button colorScheme="red" onClick={handleClose}>
+                        Discard Changes
+                      </Button>
+                    ) : (
+                      <>
+                        <Button colorScheme="red" onClick={handleReset}>
+                          Reset
+                        </Button>
+                        <Button colorScheme="gray" onClick={handleClose}>
+                          Close
+                        </Button>
+                      </>
+                    )}
                   </HStack>
                 </HStack>
               </FormControl>

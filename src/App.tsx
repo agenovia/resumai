@@ -54,6 +54,7 @@ function App() {
     if (storedHistory) {
       setWorkHistory([...JSON.parse(storedHistory)]);
     }
+    window.scrollTo(0, 0);
   }, []);
 
   const handleDelete = (entry: WorkHistoryFormValues) => {
