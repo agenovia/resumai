@@ -135,16 +135,7 @@ const WorkHistoryForm = ({
                   mb={4}
                 />
               </FormControl>
-              <FormControl mb={4}>
-                <FormLabel>Personal Note</FormLabel>
-                <Textarea
-                  id="personalNote"
-                  {...register("personalNote", { required: true })}
-                  mb={4}
-                  placeholder={placeholders.personalNote}
-                  minH="200px"
-                />
-              </FormControl>
+
               <HStack mb={4}>
                 <FormControl isRequired={true}>
                   <FormLabel>Start Date</FormLabel>
@@ -188,6 +179,16 @@ const WorkHistoryForm = ({
                   mb={2}
                   placeholder={placeholders.workResponsibilities}
                   height="200px"
+                />
+              </FormControl>
+              <FormControl mb={4}>
+                <FormLabel>Personal Note</FormLabel>
+                <Textarea
+                  id="personalNote"
+                  {...register("personalNote", { required: true })}
+                  mb={4}
+                  placeholder={placeholders.personalNote}
+                  minH="200px"
                 />
               </FormControl>
               <FormControl mb={4}>
