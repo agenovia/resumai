@@ -27,7 +27,7 @@ resulting in an 18% profit margin boost`,
   personalNote: `Add a personal note about this job that might not be reflected by the job title.\n\n\
 Examples:\n"I was the first employee at this startup, and I was responsible for building the entire product from scratch."\n\
 "I wore many hats at this job and fulfilled the role of a product manager, a designer, and a developer."\n\
-"I reported directly to the CTO and was responsible for managing a team of 5 developers and 2 designers."`,
+"I reported directly to the CTO and was responsible for managing a team of 5 analysts and 2 developers."`,
 };
 
 export const limits = {
