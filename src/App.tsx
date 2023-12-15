@@ -47,7 +47,7 @@ function App() {
     if (workHistory.length > 0) {
       saveHistory(workHistory);
     }
-  }, [workHistory]);
+  }, [workHistory, selectedEditHistory]);
 
   useEffect(() => {
     const storedHistory = localStorage.getItem("resumai-work-history");
