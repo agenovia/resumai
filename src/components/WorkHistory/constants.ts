@@ -1,5 +1,5 @@
 export const placeholders = {
-  workDescription: `Describe the work you performed in this role.\
+  workResponsibilities: `Describe the work you performed in this role.\
     \n\nExamples:\
     \n- Coordinated project timelines, allocated resources, and ensured that project objectives are met within specified deadlines.\
     \n- Managed a team of 5 developers, 2 designers, and 3 QA engineers.\

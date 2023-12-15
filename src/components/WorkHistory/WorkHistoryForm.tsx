@@ -181,12 +181,12 @@ const WorkHistoryForm = ({
                 </FormControl>
               </HStack>
               <FormControl isRequired={true} mb={4}>
-                <FormLabel>Description</FormLabel>
+                <FormLabel>Responsibilities</FormLabel>
                 <Textarea
                   id="description"
                   {...register("description", { required: true })}
                   mb={2}
-                  placeholder={placeholders.workDescription}
+                  placeholder={placeholders.workResponsibilities}
                   height="200px"
                 />
               </FormControl>
