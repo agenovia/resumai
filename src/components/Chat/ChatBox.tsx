@@ -12,14 +12,12 @@ import { LuSend } from "react-icons/lu";
 import useRetriever from "../../hooks/useRetriever";
 import WorkHistoryFormValues from "../WorkHistory/types";
 import ChatMessage from "./ChatMessage";
-import { DocumentInput } from "langchain/document";
 
 interface Props {
-  workHistory: WorkHistoryFormValues[];
-  metadataFilter?: Record<string, unknown>;
+  workHistory: WorkHistoryFormValues;
 }
 
-const ChatBox = ({ workHistory, metadataFilter }: Props) => {
+const ChatBox = ({ workHistory }: Props) => {
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [query, setQuery] = useState("");
   const { retriever } = useRetriever({ workHistory });
@@ -38,10 +36,9 @@ const ChatBox = ({ workHistory, metadataFilter }: Props) => {
     const lastMessage = chatHistory[chatHistory.length - 1];
     if (lastMessage.from === "system") return;
     const query = lastMessage.text;
-    debugger;
     const getDocs = async () => {
       await retriever
-        ?.ask(query, metadataFilter)
+        ?.ask(query)
         .then((response) => handleSystemMessage(response));
     };
     getDocs();

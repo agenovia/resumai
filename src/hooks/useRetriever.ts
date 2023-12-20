@@ -3,7 +3,7 @@ import WorkHistoryFormValues from "../components/WorkHistory/types";
 import RetrieverClient from "../services/retrieverClient";
 
 interface Props {
-  workHistory: WorkHistoryFormValues[];
+  workHistory: WorkHistoryFormValues;
 }
 
 const useRetriever = ({ workHistory }: Props) => {

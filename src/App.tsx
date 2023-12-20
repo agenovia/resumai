@@ -1,21 +1,34 @@
-import { VStack } from "@chakra-ui/react";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerOverlay,
+  Flex,
+  VStack,
+} from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import "./App.css";
+import ChatBox from "./components/Chat/ChatBox";
 import AddWorkHistoryButton from "./components/WorkHistory/AddWorkHistoryButton";
 import WorkHistoryForm from "./components/WorkHistory/WorkHistoryForm";
 import WorkHistoryFormValues from "./components/WorkHistory/types";
-import WorkTimeline from "./components/WorkTimeline/WorkTimeline";
+import WorkTimelineItem from "./components/WorkTimeline/WorkTimelineItem";
 
 function App() {
   const [modalOpen, setModalOpen] = useState(false);
   const [workHistory, setWorkHistory] = useState<WorkHistoryFormValues[]>([]);
   const [selectedEditHistory, setSelectedEditHistory] =
     useState<WorkHistoryFormValues>();
+  const [selectedChatItem, setSelectedChatItem] =
+    useState<WorkHistoryFormValues>();
   const [replaceIndex, setReplaceIndex] = useState<number>();
 
   const flushReplace = () => {
     setSelectedEditHistory(undefined);
     setReplaceIndex(undefined);
+  };
+
+  const saveHistory = (items: WorkHistoryFormValues[]) => {
+    localStorage.setItem("resumai-work-history", JSON.stringify(items));
   };
 
   const handleSubmit = (
@@ -39,8 +52,36 @@ function App() {
     flushReplace();
   };
 
-  const saveHistory = (items: WorkHistoryFormValues[]) => {
-    localStorage.setItem("resumai-work-history", JSON.stringify(items));
+  const handleAddNewEntry = () => {
+    flushReplace();
+    setModalOpen(true);
+  };
+
+  const handleDeleteEntry = (entry: WorkHistoryFormValues) => {
+    const newWorkHistory = workHistory.filter((item) => item !== entry);
+    setWorkHistory(newWorkHistory);
+    saveHistory(newWorkHistory);
+    flushReplace();
+  };
+
+  const handleEditEntry = (entry: WorkHistoryFormValues) => {
+    const editHistoryIndex = workHistory.indexOf(entry);
+    setSelectedEditHistory(workHistory[editHistoryIndex]);
+    setReplaceIndex(editHistoryIndex);
+    setModalOpen(true);
+  };
+
+  const handleCloseForm = () => {
+    flushReplace();
+    setModalOpen(false);
+  };
+
+  const handleOpenChat = (workHistoryItem: WorkHistoryFormValues) => {
+    setSelectedChatItem(workHistoryItem);
+  };
+
+  const handleCloseChat = () => {
+    setSelectedChatItem(undefined);
   };
 
   useEffect(() => {
@@ -57,45 +98,48 @@ function App() {
     window.scrollTo(0, 0);
   }, []);
 
-  const handleDelete = (entry: WorkHistoryFormValues) => {
-    const newWorkHistory = workHistory.filter((item) => item !== entry);
-    setWorkHistory(newWorkHistory);
-    saveHistory(newWorkHistory);
-    flushReplace();
-  };
-
-  const handleEdit = (entry: WorkHistoryFormValues) => {
-    const editHistoryIndex = workHistory.indexOf(entry);
-    setSelectedEditHistory(workHistory[editHistoryIndex]);
-    setReplaceIndex(editHistoryIndex);
-    setModalOpen(true);
-  };
-
-  const handleAddNewEntry = () => {
-    flushReplace();
-    setModalOpen(true);
-  };
-
-  const handleClose = () => {
-    flushReplace();
-    setModalOpen(false);
-  };
-
   return (
     <VStack spacing="24px">
       <WorkHistoryForm
         isOpen={modalOpen}
-        onClose={handleClose}
+        onClose={handleCloseForm}
         onSubmit={handleSubmit}
         workHistory={selectedEditHistory}
         replaceIndex={replaceIndex}
       />
       <AddWorkHistoryButton onAddWorkHistory={handleAddNewEntry} />
-      <WorkTimeline
-        workHistory={workHistory}
-        onDelete={handleDelete}
-        onEdit={handleEdit}
-      />
+      <Flex direction="column" align="left" m={4} pl={10} pr={10}>
+        {workHistory.map((item, idx) => (
+          <WorkTimelineItem
+            expanded={false}
+            key={idx}
+            workHistoryItem={item}
+            delayMultiplier={Math.max(+(0.75 / (idx + 1)).toFixed(2), 0.05)}
+            onChatClick={handleOpenChat}
+            onDelete={handleDeleteEntry}
+            onEdit={handleEditEntry}
+          />
+        ))}
+      </Flex>
+      <Drawer
+        placement="bottom"
+        size="lg"
+        onClose={handleCloseChat}
+        isOpen={selectedChatItem !== undefined}
+        closeOnOverlayClick
+      >
+        <DrawerOverlay />
+        <DrawerContent
+          pb={10}
+          pt={10}
+          pl={10}
+          pr={10}
+          borderRadius={10}
+          bgColor="transparent"
+        >
+          {selectedChatItem && <ChatBox workHistory={selectedChatItem} />}
+        </DrawerContent>
+      </Drawer>
     </VStack>
   );
 }

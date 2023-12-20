@@ -9,7 +9,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { GoDot, GoDotFill, GoTrash, GoPencil } from "react-icons/go";
+import { GoDot, GoDotFill, GoPencil, GoTrash } from "react-icons/go";
 
 import WorkHistoryFormValues from "../WorkHistory/types";
 import "./styles.css";
@@ -22,7 +22,7 @@ interface Props {
   onDelete: (entry: WorkHistoryFormValues) => void;
   onEdit: (entry: WorkHistoryFormValues) => void;
   onChatClick: (
-    workHistory: WorkHistoryFormValues[],
+    workHistory: WorkHistoryFormValues,
     metadataFilter?: Record<string, unknown>
   ) => void;
 }

@@ -18,8 +18,8 @@ import "./styles.css";
 
 interface Props {
   workHistoryItem: WorkHistoryFormValues;
-  onChatClick: (
-    workHistory: WorkHistoryFormValues[],
+  onChatClick?: (
+    workHistory: WorkHistoryFormValues,
     metadataFilter?: Record<string, unknown>
   ) => void;
 }
@@ -63,14 +63,16 @@ const WorkTimelineCard = ({ workHistoryItem, onChatClick }: Props) => {
                     <Text>{workHistoryItem.jobTitle}</Text>
                   </HStack>
                 </Badge>
-                <IconButton
-                  aria-label="Chat about this job"
-                  title="Chat about this job"
-                  rounded="full"
-                  bgColor="transparent"
-                  icon={<FaCommentDots />}
-                  onClick={() => onChatClick([workHistoryItem], metadataFilter)}
-                />
+                {onChatClick && (
+                  <IconButton
+                    aria-label="Chat about this job"
+                    title="Chat about this job"
+                    rounded="full"
+                    bgColor="transparent"
+                    icon={<FaCommentDots />}
+                    onClick={() => onChatClick(workHistoryItem, metadataFilter)}
+                  />
+                )}
               </HStack>
             </VStack>
           </CardHeader>
