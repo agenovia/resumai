@@ -20,9 +20,15 @@ const WorkTimeline = ({ workHistory, onDelete, onEdit }: Props) => {
   const [selectedHistory, setSelectedHistory] = useState<
     WorkHistoryFormValues[]
   >([]);
+  const [metadataFilter, setMetadataFilter] =
+    useState<Record<string, unknown>>();
 
-  const handleChatClick = (workHistory: WorkHistoryFormValues[]) => {
+  const handleChatClick = (
+    workHistory: WorkHistoryFormValues[],
+    metadataFilter?: Record<string, unknown>
+  ) => {
     setSelectedHistory(workHistory);
+    setMetadataFilter(metadataFilter);
   };
 
   const handleCloseChat = () => {
@@ -60,7 +66,10 @@ const WorkTimeline = ({ workHistory, onDelete, onEdit }: Props) => {
           bgColor="transparent"
         >
           <VStack>
-            <ChatBox workHistory={selectedHistory} />
+            <ChatBox
+              workHistory={selectedHistory}
+              metadataFilter={metadataFilter}
+            />
           </VStack>
         </DrawerContent>
       </Drawer>

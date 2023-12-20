@@ -11,7 +11,7 @@ type WorkHistoryFormValues = {
 export type WorkAccomplishment = {
   headline: string;
   context: string;
-  skills: string;
+  skills: string[];
 };
 
 export default WorkHistoryFormValues;

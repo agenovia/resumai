@@ -10,20 +10,19 @@ import {
 import { useEffect, useState } from "react";
 import { LuSend } from "react-icons/lu";
 import useRetriever from "../../hooks/useRetriever";
-import ChatClient from "../../services/chatClient";
 import WorkHistoryFormValues from "../WorkHistory/types";
 import ChatMessage from "./ChatMessage";
+import { DocumentInput } from "langchain/document";
 
 interface Props {
   workHistory: WorkHistoryFormValues[];
+  metadataFilter?: Record<string, unknown>;
 }
 
-const client = new ChatClient(import.meta.env.VITE_OPENAI_KEY);
-
-const ChatBox = ({ workHistory }: Props) => {
+const ChatBox = ({ workHistory, metadataFilter }: Props) => {
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [query, setQuery] = useState("");
-  const { retriever } = useRetriever({ client, workHistory });
+  const { retriever } = useRetriever({ workHistory });
   const splashMessage = `Hi, I'm ResumAI. I can help you answer questions you may \
   have about the client's work history. You can try asking simple questions like "What are \
   the client's top accomplishments in 2022" or deep dive into context not normally addressed \
@@ -39,12 +38,11 @@ const ChatBox = ({ workHistory }: Props) => {
     const lastMessage = chatHistory[chatHistory.length - 1];
     if (lastMessage.from === "system") return;
     const query = lastMessage.text;
+    debugger;
     const getDocs = async () => {
-      retriever?.getRelevantDocuments(query).then((r) => {
-        handleSystemMessage(
-          r.reduce((acc, val) => acc + val.pageContent, "") ?? ""
-        );
-      });
+      await retriever
+        ?.ask(query, metadataFilter)
+        .then((response) => handleSystemMessage(response));
     };
     getDocs();
   }, [chatHistory]);

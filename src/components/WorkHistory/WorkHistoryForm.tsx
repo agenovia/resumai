@@ -117,6 +117,12 @@ const WorkHistoryForm = ({
                   description: (data.description as unknown as string)
                     .split(/(?:(?:(?<!=\w)-(?!\w))|\n|•|○|⦿|⦾|‣|⁃)/)
                     .filter((x) => x.trim().length > 0),
+                  accomplishments: data.accomplishments.map((v) => ({
+                    ...v,
+                    skills: (v.skills as unknown as string)
+                      .split(/(?:,|;)/)
+                      .filter((x) => x.trim().length > 0),
+                  })),
                 };
                 onSubmit(_data, replaceIndex);
               })}

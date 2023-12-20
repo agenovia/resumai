@@ -21,7 +21,10 @@ interface Props {
   delayMultiplier: number;
   onDelete: (entry: WorkHistoryFormValues) => void;
   onEdit: (entry: WorkHistoryFormValues) => void;
-  onChatClick: (workHistory: WorkHistoryFormValues[]) => void;
+  onChatClick: (
+    workHistory: WorkHistoryFormValues[],
+    metadataFilter?: Record<string, unknown>
+  ) => void;
 }
 
 const WorkTimelineItem = ({

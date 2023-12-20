@@ -1,7 +1,7 @@
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
 import { OpenAI } from "langchain/llms/openai";
 
-class ChatClient {
+class OpenAIClient {
   client: OpenAI;
   embeddings: OpenAIEmbeddings;
 
@@ -12,4 +12,4 @@ class ChatClient {
   }
 }
 
-export default ChatClient;
+export default OpenAIClient;

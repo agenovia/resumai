@@ -18,11 +18,20 @@ import "./styles.css";
 
 interface Props {
   workHistoryItem: WorkHistoryFormValues;
-  onChatClick: (workHistory: WorkHistoryFormValues[]) => void;
+  onChatClick: (
+    workHistory: WorkHistoryFormValues[],
+    metadataFilter?: Record<string, unknown>
+  ) => void;
 }
 
 const WorkTimelineCard = ({ workHistoryItem, onChatClick }: Props) => {
   const hasAccomplishments = workHistoryItem.accomplishments.length > 0;
+  const metadataFilter = {
+    company: workHistoryItem.company,
+    jobTitle: workHistoryItem.jobTitle,
+    startDate: workHistoryItem.startDate,
+    endDate: workHistoryItem.endDate,
+  };
   return (
     <Box className="main-card" overflow="hidden">
       <Card>
@@ -60,7 +69,7 @@ const WorkTimelineCard = ({ workHistoryItem, onChatClick }: Props) => {
                   rounded="full"
                   bgColor="transparent"
                   icon={<FaCommentDots />}
-                  onClick={() => onChatClick([workHistoryItem])}
+                  onClick={() => onChatClick([workHistoryItem], metadataFilter)}
                 />
               </HStack>
             </VStack>

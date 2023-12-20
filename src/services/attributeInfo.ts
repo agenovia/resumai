@@ -27,18 +27,28 @@ export const jobDescriptionAttributes: AttributeInfo[] = [
 export const accomplishmentAttributes: AttributeInfo[] = [
   ...jobDescriptionAttributes,
   {
-    name: "context",
-    description: "The context of the accomplishment",
+    name: "headline",
+    description: "The title of the accomplishment",
     type: "string",
   },
-  //   {
-  //     name: "headline",
-  //     description: "The client's accomplishment",
-  //     type: "string",
-  //   },
+
+  // {
+  //   name: "skills",
+  //   description: "The skills used to accomplish the task",
+  //   type: "array of strings",
+  // },
   {
-    name: "skills",
-    description: "The skills used to accomplish the task",
-    type: "array of strings",
+    name: "section",
+    description: "Whether it's an accomplishment or a description of a job",
+    type: "string",
   },
 ];
+/*
+                company: v.company,
+                jobTitle: v.jobTitle,
+                startDate: v.startDate,
+                endDate: v.endDate,
+                headline: a.headline,
+                skills: a.skills,
+                section: "accomplishments",
+*/
