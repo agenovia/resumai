@@ -113,8 +113,8 @@ function App() {
           <WorkTimelineItem
             expanded={false}
             key={idx}
+            index={idx}
             workHistoryItem={item}
-            delayMultiplier={Math.max(+(0.75 / (idx + 1)).toFixed(2), 0.05)}
             onChatClick={handleOpenChat}
             onDelete={handleDeleteEntry}
             onEdit={handleEditEntry}
@@ -129,14 +129,7 @@ function App() {
         closeOnOverlayClick
       >
         <DrawerOverlay />
-        <DrawerContent
-          pb={10}
-          pt={10}
-          pl={10}
-          pr={10}
-          borderRadius={10}
-          bgColor="transparent"
-        >
+        <DrawerContent p="50px" borderRadius={10} bgColor="transparent">
           {selectedChatItem && <ChatBox workHistory={selectedChatItem} />}
         </DrawerContent>
       </Drawer>

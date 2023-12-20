@@ -18,7 +18,7 @@ import WorkTimelineCard from "./WorkTimelineCard";
 interface Props {
   workHistoryItem: WorkHistoryFormValues;
   expanded: boolean;
-  delayMultiplier: number;
+  index: number;
   onDelete: (entry: WorkHistoryFormValues) => void;
   onEdit: (entry: WorkHistoryFormValues) => void;
   onChatClick: (
@@ -28,15 +28,16 @@ interface Props {
 }
 
 const WorkTimelineItem = ({
-  expanded,
-  delayMultiplier,
   workHistoryItem,
-  onChatClick,
+  expanded,
+  index,
   onDelete,
   onEdit,
+  onChatClick,
 }: Props) => {
   const [isExpanded, setExpanded] = useState(expanded);
   const isCurrent = workHistoryItem.endDate.length === 0;
+  const delayMultiplier = Math.max(+(0.75 / (index + 1)).toFixed(2), 0.05);
 
   const getDuration = (startDate: string, endDate: string) => {
     const start = new Date(startDate + "T00:00:00");
