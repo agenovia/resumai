@@ -185,10 +185,6 @@ class RetrieverClient extends OpenAIClient {
       vectorstore,
       childDocumentRetriever,
       docstore,
-      // parentSplitter: new RecursiveCharacterTextSplitter({
-      //   chunkOverlap: 150,
-      //   chunkSize: 1000,
-      // }),
       childSplitter: new RecursiveCharacterTextSplitter({
         chunkOverlap: 0,
         chunkSize: 50,
@@ -206,14 +202,9 @@ class RetrieverClient extends OpenAIClient {
   };
 
   ask = async (question: string) => {
-    // const retriever = await this.fetchDomainRetriever();
     const retriever = await this.fetchParentDocumentRetriever();
-    // const context = await retriever.getRelevantDocuments(question);
     const fasterChain = this.fastChain;
     const slowerChain = this.slowChain;
-    // const memory = this.memory;
-
-    // debugger;
 
     const serializeChatHistory = async (chatHistory: Array<BaseMessage>) => {
       return chatHistory
