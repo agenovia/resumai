@@ -2,12 +2,14 @@ import { LLMChain } from "langchain/chains";
 import { Document } from "langchain/document";
 import { BufferMemory } from "langchain/memory";
 import { PromptTemplate } from "langchain/prompts";
+import { ParentDocumentRetriever } from "langchain/retrievers/parent_document";
 import {
   ScoreThresholdRetriever,
   ScoreThresholdRetrieverInput,
 } from "langchain/retrievers/score_threshold";
 import { BaseMessage } from "langchain/schema";
 import { RunnableSequence } from "langchain/schema/runnable";
+import { InMemoryStore } from "langchain/storage/in_memory";
 import {
   RecursiveCharacterTextSplitter,
   RecursiveCharacterTextSplitterParams,
@@ -16,8 +18,6 @@ import { formatDocumentsAsString } from "langchain/util/document";
 import { MemoryVectorStore } from "langchain/vectorstores/memory";
 import WorkHistoryFormValues from "../components/WorkHistory/types";
 import OpenAIClient from "./openAIClient";
-import { ParentDocumentRetriever } from "langchain/retrievers/parent_document";
-import { InMemoryStore } from "langchain/storage/in_memory";
 
 type RetrieverSettings = Omit<
   ScoreThresholdRetrieverInput<MemoryVectorStore>,
@@ -32,8 +32,8 @@ const defaultRetrieverSettings: RetrieverSettings = {
 };
 
 const defaultSplitterSettings: SplitterSettings = {
-  chunkSize: 500,
-  chunkOverlap: 100,
+  chunkSize: 250,
+  chunkOverlap: 50,
 };
 
 /**
@@ -98,26 +98,29 @@ class RetrieverClient extends OpenAIClient {
     });
   }
 
+  getDocuments = () => {
+    return this.workHistory.accomplishments.map(
+      (a) =>
+        new Document({
+          pageContent: a.context,
+          metadata: {
+            company: this.workHistory.company,
+            jobTitle: this.workHistory.jobTitle,
+            startDate: this.workHistory.startDate,
+            endDate: this.workHistory.endDate,
+            headline: a.headline,
+            skills: a.skills,
+            section: "accomplishments",
+          },
+        })
+    );
+  };
+
   splitDocuments = async () => {
     if (this.documents.length > 0) {
       return this.documents;
     } else {
-      const doc = this.workHistory.accomplishments.map(
-        (a) =>
-          new Document({
-            pageContent: a.context,
-            metadata: {
-              company: this.workHistory.company,
-              jobTitle: this.workHistory.jobTitle,
-              startDate: this.workHistory.startDate,
-              endDate: this.workHistory.endDate,
-              headline: a.headline,
-              skills: a.skills,
-              section: "accomplishments",
-            },
-          })
-      );
-      return await this.splitter.splitDocuments(doc);
+      return await this.splitter.splitDocuments(this.getDocuments());
     }
   };
 
@@ -131,12 +134,30 @@ class RetrieverClient extends OpenAIClient {
     return this.vectorStore;
   };
 
+  fetchUnsplitVectorStore = async () => {
+    return await MemoryVectorStore.fromDocuments(
+      this.getDocuments(),
+      this.embeddings
+    );
+  };
+
   fetchScoreThresholdRetriever = async () => {
     const vectorStore = await this.fetchVectorStore();
     return ScoreThresholdRetriever.fromVectorStore(vectorStore, {
-      minSimilarityScore: 0.75, // Essentially no threshold
+      minSimilarityScore: 0.8, // Essentially no threshold
       maxK: 1, // Only return the top result
-      kIncrement: 1,
+      kIncrement: vectorStore.memoryVectors.length,
+      verbose: true,
+      searchType: "similarity",
+    });
+  };
+
+  fetchUnsplitScoreThresholdRetriever = async () => {
+    const vectorStore = await this.fetchUnsplitVectorStore();
+    return ScoreThresholdRetriever.fromVectorStore(vectorStore, {
+      minSimilarityScore: 0.8, // Essentially no threshold
+      maxK: 1, // Only return the top result
+      verbose: true,
       searchType: "similarity",
     });
   };
@@ -147,44 +168,52 @@ class RetrieverClient extends OpenAIClient {
   };
 
   fetchParentDocumentRetriever = async () => {
+    // const vectorstore = await this.fetchVectorStore();
+    // const vectorstore = await this.fetchUnsplitVectorStore();
+    const vectorstore = new MemoryVectorStore(this.embeddings);
+    const childDocumentRetriever = ScoreThresholdRetriever.fromVectorStore(
+      vectorstore,
+      {
+        minSimilarityScore: 0.8,
+        maxK: 1, // Only return the top result
+        kIncrement: 200,
+        searchType: "similarity",
+      }
+    );
     const docstore = new InMemoryStore();
     const retriever = new ParentDocumentRetriever({
-      vectorstore: await this.fetchVectorStore(),
-      childDocumentRetriever: await this.fetchScoreThresholdRetriever(),
+      vectorstore,
+      childDocumentRetriever,
       docstore,
+      // parentSplitter: new RecursiveCharacterTextSplitter({
+      //   chunkOverlap: 150,
+      //   chunkSize: 1000,
+      // }),
       childSplitter: new RecursiveCharacterTextSplitter({
         chunkOverlap: 0,
-        chunkSize: 500,
+        chunkSize: 50,
       }),
       // Optional `k` parameter to search for more child documents in VectorStore.
       // Note that this does not exactly correspond to the number of final (parent) documents
       // retrieved, as multiple child documents can point to the same parent.
-      childK: 20,
+      childK: 100,
       // Optional `k` parameter to limit number of final, parent documents returned from this
       // retriever and sent to LLM. This is an upper-bound, and the final count may be lower than this.
-      parentK: 5,
+      parentK: 20,
     });
-    retriever.addDocuments(await this.splitDocuments());
+    await retriever.addDocuments(this.getDocuments());
     return retriever;
   };
 
   ask = async (question: string) => {
     // const retriever = await this.fetchDomainRetriever();
     const retriever = await this.fetchParentDocumentRetriever();
-    const context = await retriever.getRelevantDocuments(question);
-    const serializedDocs = formatDocumentsAsString(context);
+    // const context = await retriever.getRelevantDocuments(question);
     const fasterChain = this.fastChain;
     const slowerChain = this.slowChain;
     const memory = this.memory;
-    const docs = await this.splitDocuments();
-    // console.log(docs);
-    console.log(
-      await retriever.getRelevantDocuments(
-        "Tell me more about the ID Cards project"
-      )
-    );
-    const scoreRetriever = await this.fetchScoreThresholdRetriever();
-    debugger;
+
+    // debugger;
 
     const serializeChatHistory = async (chatHistory: Array<BaseMessage>) => {
       return chatHistory
@@ -229,6 +258,16 @@ class RetrieverClient extends OpenAIClient {
         question: newQuestion,
       });
 
+      // Save the chat history to memory
+      await memory.saveContext(
+        {
+          question: input.question,
+        },
+        {
+          text: response.text,
+        }
+      );
+
       return {
         result: response.text,
         sourceDocuments: input.context,
@@ -254,7 +293,7 @@ class RetrieverClient extends OpenAIClient {
     const response = await chain.invoke({ question });
 
     // Save the chat history to memory
-    await memory.saveContext(
+    await this.memory.saveContext(
       {
         question: question,
       },
