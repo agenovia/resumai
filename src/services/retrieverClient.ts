@@ -211,7 +211,7 @@ class RetrieverClient extends OpenAIClient {
     // const context = await retriever.getRelevantDocuments(question);
     const fasterChain = this.fastChain;
     const slowerChain = this.slowChain;
-    const memory = this.memory;
+    // const memory = this.memory;
 
     // debugger;
 
@@ -231,6 +231,7 @@ class RetrieverClient extends OpenAIClient {
 
     const performQuestionAnswering = async (input: {
       question: string;
+      memory: BufferMemory;
       chatHistory: Array<BaseMessage> | null;
       context: Array<Document>;
     }): Promise<{ result: string; sourceDocuments: Array<Document> }> => {
@@ -259,7 +260,7 @@ class RetrieverClient extends OpenAIClient {
       });
 
       // Save the chat history to memory
-      await memory.saveContext(
+      await input.memory.saveContext(
         {
           question: input.question,
         },
@@ -277,9 +278,10 @@ class RetrieverClient extends OpenAIClient {
       {
         // Pipe the question through unchanged
         question: (input: { question: string }) => input.question,
+        memory: () => this.memory,
         // Fetch the chat history, and return the history or null if not present
         chatHistory: async () => {
-          const savedMemory = await memory.loadMemoryVariables({});
+          const savedMemory = await this.memory.loadMemoryVariables({});
           const hasHistory = savedMemory.chatHistory?.length > 0;
           return hasHistory ? savedMemory.chatHistory : null;
         },
@@ -291,16 +293,6 @@ class RetrieverClient extends OpenAIClient {
     ]);
 
     const response = await chain.invoke({ question });
-
-    // Save the chat history to memory
-    await this.memory.saveContext(
-      {
-        question: question,
-      },
-      {
-        text: response,
-      }
-    );
     return response.result?.trim();
   };
 }
