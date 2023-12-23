@@ -1,13 +1,7 @@
-import {
-  Drawer,
-  DrawerContent,
-  DrawerOverlay,
-  Flex,
-  VStack,
-} from "@chakra-ui/react";
+import { Flex, VStack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import "./App.css";
-import ChatBox from "./components/Chat/ChatBox";
+import ChatDrawerSection from "./components/Chat/ChatDrawerSection";
 import AddWorkHistoryButton from "./components/WorkHistory/AddWorkHistoryButton";
 import WorkHistoryForm from "./components/WorkHistory/WorkHistoryForm";
 import WorkHistoryFormValues from "./components/WorkHistory/types";
@@ -121,18 +115,10 @@ function App() {
           />
         ))}
       </Flex>
-      <Drawer
-        placement="bottom"
-        size="lg"
-        onClose={handleCloseChat}
-        isOpen={selectedChatItem !== undefined}
-        closeOnOverlayClick
-      >
-        <DrawerOverlay />
-        <DrawerContent p="50px" borderRadius={10} bgColor="transparent">
-          {selectedChatItem && <ChatBox workHistory={selectedChatItem} />}
-        </DrawerContent>
-      </Drawer>
+      <ChatDrawerSection
+        selectedChatItem={selectedChatItem}
+        handleCloseChat={handleCloseChat}
+      />
     </VStack>
   );
 }

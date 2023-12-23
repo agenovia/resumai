@@ -7,12 +7,12 @@ import {
   InputRightElement,
   VStack,
 } from "@chakra-ui/react";
+import { BaseMessage } from "langchain/schema";
 import { useEffect, useState } from "react";
 import { LuSend } from "react-icons/lu";
 import useTimelineItemRetriever from "../../hooks/useTimelineItemRetriever";
 import WorkHistoryFormValues from "../WorkHistory/types";
 import ChatMessage from "./ChatMessage";
-import { BaseMessage } from "langchain/schema";
 
 interface Props {
   workHistory: WorkHistoryFormValues;
@@ -22,11 +22,10 @@ const ChatBox = ({ workHistory }: Props) => {
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [query, setQuery] = useState("");
   const { retriever } = useTimelineItemRetriever({ workHistory });
-  const splashMessage = `Hi, I'm ResumAI. I can help you answer questions you may \
-  have about the client's work history. You can try asking simple questions like "What are \
-  the client's top accomplishments in 2022" or deep dive into context not normally addressed \
-  in a resume like "Tell me about the time you implemented a new feature at [company]. \
-  What were some of the challenges and how did you overcome them?"`;
+
+  const splashMessage = `Hi, I'm ResumAI. I'm here to help you dive deep into the client's \
+  work history. Try asking questions like "Tell me more about your work at ${workHistory.company}"\
+  or "Explain some of your accomplishments at ${workHistory.company}?"`;
 
   useEffect(() => {
     const setChatFromMemory = async () => {
@@ -107,11 +106,9 @@ const ChatBox = ({ workHistory }: Props) => {
           bgColor="gray.200"
           shadow="lg"
           overflowY="auto"
-          h="50vh"
+          h="80vh"
+          w="60vw"
         >
-          {/* <Heading size="md" textAlign="center" p={2}>
-            <Text p={2}>Topic: {topic}</Text>
-          </Heading> */}
           {chatHistory.map((message) => (
             <ChatMessage message={message} key={message.seq} />
           ))}

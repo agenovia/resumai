@@ -10,6 +10,8 @@ import {
   IconButton,
   Text,
   VStack,
+  Wrap,
+  WrapItem,
 } from "@chakra-ui/react";
 import { FaBuilding, FaCommentDots, FaIdBadge } from "react-icons/fa6";
 
@@ -39,40 +41,50 @@ const WorkTimelineCard = ({ workHistoryItem, onChatClick }: Props) => {
           <CardHeader>
             <VStack spacing={2}>
               <HStack spacing={2}>
-                <Badge
-                  fontSize="xs"
-                  variant="outline"
-                  bgColor="papayawhip"
-                  rounded="full"
-                  p={3}
-                >
-                  <HStack>
-                    <Icon as={FaBuilding} />
-                    <Text>{workHistoryItem.company}</Text>
-                  </HStack>
-                </Badge>
-                <Badge
-                  fontSize="xs"
-                  variant="solid"
-                  bgColor="tomato"
-                  rounded="full"
-                  p={3}
-                >
-                  <HStack>
-                    <Icon as={FaIdBadge} />
-                    <Text>{workHistoryItem.jobTitle}</Text>
-                  </HStack>
-                </Badge>
-                {onChatClick && (
-                  <IconButton
-                    aria-label="Chat about this job"
-                    title="Chat about this job"
-                    rounded="full"
-                    bgColor="transparent"
-                    icon={<FaCommentDots />}
-                    onClick={() => onChatClick(workHistoryItem, metadataFilter)}
-                  />
-                )}
+                <Wrap>
+                  <WrapItem>
+                    <Badge
+                      fontSize="xs"
+                      variant="outline"
+                      bgColor="papayawhip"
+                      rounded="full"
+                      p={3}
+                    >
+                      <HStack>
+                        <Icon as={FaBuilding} />
+                        <Text>{workHistoryItem.company}</Text>
+                      </HStack>
+                    </Badge>
+                  </WrapItem>
+                  <WrapItem>
+                    <Badge
+                      fontSize="xs"
+                      variant="solid"
+                      bgColor="tomato"
+                      rounded="full"
+                      p={3}
+                    >
+                      <HStack>
+                        <Icon as={FaIdBadge} />
+                        <Text>{workHistoryItem.jobTitle}</Text>
+                      </HStack>
+                    </Badge>
+                  </WrapItem>
+                  {onChatClick && (
+                    <WrapItem>
+                      <IconButton
+                        aria-label="Chat about this job"
+                        title="Chat about this job"
+                        rounded="full"
+                        bgColor="transparent"
+                        icon={<FaCommentDots />}
+                        onClick={() =>
+                          onChatClick(workHistoryItem, metadataFilter)
+                        }
+                      />
+                    </WrapItem>
+                  )}
+                </Wrap>
               </HStack>
             </VStack>
           </CardHeader>
