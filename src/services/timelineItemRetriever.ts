@@ -192,7 +192,18 @@ class TimelineItemRetriever extends OpenAIClient {
   }> => {
     let newQuestion = input.question;
     // Serialize context and chat history into strings
+    const skills = input.context
+      .map((d) => d.metadata.skills)
+      .flat()
+      .join(", ");
     const serializedDocs = formatDocumentsAsString(input.context);
+    let fullContext;
+    if (skills.trim().length > 0) {
+      fullContext = `${serializedDocs}\nSkills: ${skills}`;
+    } else {
+      fullContext = serializedDocs;
+    }
+
     const chatHistoryString = input.chatHistory
       ? input.chatHistorySerializer(input.chatHistory)
       : null;
@@ -204,7 +215,7 @@ class TimelineItemRetriever extends OpenAIClient {
       // Call the faster chain to generate a new question
       const { text } = await fastChain.invoke({
         chatHistory: chatHistoryString,
-        context: serializedDocs,
+        context: fullContext,
         question: input.question,
       });
 
@@ -213,7 +224,7 @@ class TimelineItemRetriever extends OpenAIClient {
 
     const response = await slowChain.invoke({
       chatHistory: chatHistoryString ?? "",
-      context: serializedDocs,
+      context: fullContext,
       question: newQuestion,
     });
 

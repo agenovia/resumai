@@ -22,6 +22,7 @@ const ChatBox = ({ workHistory }: Props) => {
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [query, setQuery] = useState("");
   const { retriever } = useTimelineItemRetriever({ workHistory });
+  const [isLoading, setIsLoading] = useState(false);
 
   const splashMessage = `Hi, I'm ResumAI. I'm here to help you dive deep into the client's \
   work history. Try asking questions like "Tell me more about your work at ${workHistory.company}"\
@@ -85,6 +86,7 @@ const ChatBox = ({ workHistory }: Props) => {
         seq: chatHistory.length + 1,
       } as ChatMessage,
     ]);
+    setIsLoading(false);
   };
 
   const handleSend = () => {
@@ -96,6 +98,7 @@ const ChatBox = ({ workHistory }: Props) => {
     } as ChatMessage;
     setChatHistory([...chatHistory, message]);
     setQuery("");
+    setIsLoading(true);
   };
 
   return (
@@ -112,6 +115,7 @@ const ChatBox = ({ workHistory }: Props) => {
           {chatHistory.map((message) => (
             <ChatMessage message={message} key={message.seq} />
           ))}
+          {isLoading && <ChatMessage isLoading={isLoading} />}
         </Box>
         <InputGroup>
           <Input

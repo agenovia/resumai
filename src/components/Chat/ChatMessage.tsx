@@ -1,4 +1,5 @@
-import { Flex, SkeletonText, Spacer, Text } from "@chakra-ui/react";
+import { Flex, Spacer, Text } from "@chakra-ui/react";
+import BouncingDots from "./BouncingDots";
 
 interface ChatMessage {
   from: "system" | "user";
@@ -7,12 +8,12 @@ interface ChatMessage {
 }
 
 interface Props {
-  message: ChatMessage;
+  message?: ChatMessage;
   isLoading?: boolean;
 }
 
 const ChatMessage = ({ message, isLoading }: Props) => {
-  const isUser = message.from === "user";
+  const isUser = message?.from === "user";
   return (
     <Flex ms={isUser ? 10 : 0} me={isUser ? 0 : 10}>
       {!isLoading && isUser && <Spacer />}
@@ -26,7 +27,7 @@ const ChatMessage = ({ message, isLoading }: Props) => {
         align="left"
         whiteSpace="pre-line"
       >
-        {!isLoading ? message.text : <SkeletonText>...</SkeletonText>}
+        {!isLoading ? message?.text ?? "" : <BouncingDots />}
       </Text>
     </Flex>
   );
