@@ -1,14 +1,15 @@
-import { useQuery } from "react-query";
+// import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import WorkHistoryFormValues from "../components/WorkHistory/types";
-import RetrieverClient from "../services/retrieverClient";
+import TimelineItemRetriever from "../services/timelineItemRetriever";
 
 interface Props {
   workHistory: WorkHistoryFormValues;
 }
 
-const useRetriever = ({ workHistory }: Props) => {
+const useTimelineItemRetriever = ({ workHistory }: Props) => {
   const fetchRetriever = () => {
-    const retriever = new RetrieverClient(workHistory);
+    const retriever = new TimelineItemRetriever(workHistory);
     return retriever;
   };
 
@@ -20,4 +21,4 @@ const useRetriever = ({ workHistory }: Props) => {
   return { retriever };
 };
 
-export default useRetriever;
+export default useTimelineItemRetriever;

@@ -15,6 +15,7 @@
     "@emotion/styled": "^11.11.0",
     "@fontsource/lato": "^5.0.18",
     "@fontsource/merriweather": "^5.0.8",
+    "@tanstack/react-query-devtools": "^5.14.5",
     "framer-motion": "^10.16.16",
     "langchain": "^0.0.206",
     "peggy": "^3.0.2",

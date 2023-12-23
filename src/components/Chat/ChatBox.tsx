@@ -9,9 +9,10 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { LuSend } from "react-icons/lu";
-import useRetriever from "../../hooks/useRetriever";
+import useTimelineItemRetriever from "../../hooks/useTimelineItemRetriever";
 import WorkHistoryFormValues from "../WorkHistory/types";
 import ChatMessage from "./ChatMessage";
+import { BaseMessage } from "langchain/schema";
 
 interface Props {
   workHistory: WorkHistoryFormValues;
@@ -20,7 +21,7 @@ interface Props {
 const ChatBox = ({ workHistory }: Props) => {
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [query, setQuery] = useState("");
-  const { retriever } = useRetriever({ workHistory });
+  const { retriever } = useTimelineItemRetriever({ workHistory });
   const splashMessage = `Hi, I'm ResumAI. I can help you answer questions you may \
   have about the client's work history. You can try asking simple questions like "What are \
   the client's top accomplishments in 2022" or deep dive into context not normally addressed \
@@ -28,7 +29,36 @@ const ChatBox = ({ workHistory }: Props) => {
   What were some of the challenges and how did you overcome them?"`;
 
   useEffect(() => {
-    handleSystemMessage(splashMessage);
+    const setChatFromMemory = async () => {
+      // const setChatFromMemory = await retriever?.memory.loadMemoryVariables({});
+      // return savedMemory
+      //   ? savedMemory.chatHistory?.length > 0
+      //     ? savedMemory.chatHistory
+      //     : null
+      //   : null;
+      const savedMemory = await retriever?.memory.loadMemoryVariables({});
+      const chatHistory = savedMemory?.chatHistory;
+      if (chatHistory) {
+        // setChatHistory(chatHistory);
+        chatHistory.map((chatMessage: BaseMessage, idx: number) => {
+          if (chatMessage._getType() === "human") {
+            setChatHistory([
+              ...chatHistory,
+              { from: "user", text: chatMessage.content, seq: idx },
+            ]);
+          } else if (chatMessage._getType() === "ai") {
+            setChatHistory([
+              ...chatHistory,
+              { from: "system", text: chatMessage.content, seq: idx },
+            ]);
+          }
+        });
+      } else {
+        handleSystemMessage(splashMessage);
+      }
+    };
+    setChatFromMemory();
+    // handleSystemMessage(splashMessage);
   }, []);
 
   useEffect(() => {

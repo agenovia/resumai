@@ -143,7 +143,11 @@ const WorkAccomplishmentsList = ({
     entry?: WorkAccomplishment
   ) => {
     if (mode === "add") {
-      const newEntry = { headline, context, skills };
+      const newEntry = {
+        headline,
+        context,
+        skills: skills.split(/(?:,|;)/),
+      } as WorkAccomplishment;
       var newAccomplishments = [...accomplishments, newEntry];
     } else if (mode === "delete" && entry) {
       var newAccomplishments = accomplishments.filter((e) => e !== entry);
@@ -161,7 +165,7 @@ const WorkAccomplishmentsList = ({
     handleChangeAccomplishments("delete", entry);
     setHeadline(entry.headline);
     setContext(entry.context);
-    setSkills(entry.skills);
+    setSkills(entry.skills.join(","));
   };
 
   return (
