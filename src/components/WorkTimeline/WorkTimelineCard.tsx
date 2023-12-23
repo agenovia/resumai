@@ -35,7 +35,7 @@ const WorkTimelineCard = ({ workHistoryItem, onChatClick }: Props) => {
     endDate: workHistoryItem.endDate,
   };
   return (
-    <Box className="main-card" overflow="hidden">
+    <Box className="main-card" overflowY="scroll">
       <Card>
         <VStack>
           <CardHeader>
@@ -88,7 +88,12 @@ const WorkTimelineCard = ({ workHistoryItem, onChatClick }: Props) => {
               </HStack>
             </VStack>
           </CardHeader>
-          <CardBody textAlign="left" flexDirection="row" w="100%">
+          <CardBody
+            textAlign="left"
+            flexDirection="row"
+            w="inherit"
+            h="inherit"
+          >
             <Heading className="headings" size="sm">
               <Text>Responsibilities</Text>
             </Heading>

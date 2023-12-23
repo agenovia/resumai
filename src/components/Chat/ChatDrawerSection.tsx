@@ -43,7 +43,7 @@ const ChatDrawerSection = ({ selectedChatItem, handleCloseChat }: Props) => {
             <DrawerCloseButton
               title="Close Chat"
               position="relative"
-              ml="20px"
+              ml="30px"
               boxShadow="dark-lg"
               rounded="full"
             />

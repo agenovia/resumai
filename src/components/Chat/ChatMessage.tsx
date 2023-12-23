@@ -1,5 +1,5 @@
 import { Flex, Spacer, Text } from "@chakra-ui/react";
-import BouncingDots from "./BouncingDots";
+import BeatLoader from "react-spinners/BeatLoader";
 
 interface ChatMessage {
   from: "system" | "user";
@@ -27,7 +27,15 @@ const ChatMessage = ({ message, isLoading }: Props) => {
         align="left"
         whiteSpace="pre-line"
       >
-        {!isLoading ? message?.text ?? "" : <BouncingDots />}
+        {!isLoading ? (
+          message?.text ?? ""
+        ) : (
+          <BeatLoader
+            size="8px"
+            speedMultiplier={0.7}
+            cssOverride={{ opacity: 0.5 }}
+          />
+        )}
       </Text>
     </Flex>
   );

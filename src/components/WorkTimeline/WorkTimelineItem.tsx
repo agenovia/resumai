@@ -1,14 +1,22 @@
 import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
   Box,
+  Button,
   Flex,
   HStack,
   Icon,
   IconButton,
   SlideFade,
   Text,
+  useDisclosure,
   VStack,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { GoDot, GoDotFill, GoPencil, GoTrash } from "react-icons/go";
 
 import WorkHistoryFormValues from "../WorkHistory/types";
@@ -36,8 +44,20 @@ const WorkTimelineItem = ({
   onChatClick,
 }: Props) => {
   const [isExpanded, setExpanded] = useState(expanded);
+  const {
+    isOpen: alertIsOpen,
+    onOpen: alertOnOpen,
+    onClose: alertOnClose,
+  } = useDisclosure();
+  const cancelRef = useRef(null);
   const isCurrent = workHistoryItem.endDate.length === 0;
   const delayMultiplier = Math.max(+(0.75 / (index + 1)).toFixed(2), 0.05);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setExpanded(true);
+    }, 500);
+  }, []);
 
   const getDuration = (startDate: string, endDate: string) => {
     const start = new Date(startDate + "T00:00:00");
@@ -68,11 +88,10 @@ const WorkTimelineItem = ({
     }
   };
 
-  useEffect(() => {
-    setTimeout(() => {
-      setExpanded(true);
-    }, 500);
-  }, []);
+  const handleDelete = () => {
+    alertOnClose();
+    onDelete(workHistoryItem);
+  };
 
   return (
     <SlideFade
@@ -110,14 +129,17 @@ const WorkTimelineItem = ({
           </HStack>
         </Flex>
         <HStack spacing={2}>
-          <Flex m={2} w="100%">
+          <Flex m={2}>
             <Box bgColor="tomato" w="2px" h="inherit" rounded="full" />
             <Flex
               className="main-content"
               bg="papayawhip"
-              w="100%"
+              // w="100%"
               direction="row"
               shadow="md"
+              minW="400px"
+              maxW="1000px"
+              h="100%"
             >
               <VStack spacing={2}>
                 <WorkTimelineCard
@@ -129,7 +151,7 @@ const WorkTimelineItem = ({
                     aria-label="Delete this entry"
                     title="Delete this entry"
                     icon={<GoTrash />}
-                    onClick={() => onDelete(workHistoryItem)}
+                    onClick={alertOnOpen}
                     rounded="full"
                     colorScheme="red"
                     size="xs"
@@ -153,6 +175,30 @@ const WorkTimelineItem = ({
             <Icon as={GoDot} position="absolute" />
             <Text pl="20px">{workHistoryItem.startDate}</Text>
           </HStack>
+          <AlertDialog
+            isOpen={alertIsOpen}
+            leastDestructiveRef={cancelRef}
+            onClose={alertOnClose}
+          >
+            <AlertDialogOverlay>
+              <AlertDialogContent>
+                <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                  Delete Entry
+                </AlertDialogHeader>
+                <AlertDialogBody>
+                  Deletion cannot be undone. Press Delete to confirm.
+                </AlertDialogBody>
+                <AlertDialogFooter>
+                  <Button ref={cancelRef} onClick={alertOnClose}>
+                    Cancel
+                  </Button>
+                  <Button colorScheme="red" onClick={handleDelete} ml={3}>
+                    Delete
+                  </Button>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialogOverlay>
+          </AlertDialog>
         </Flex>
       </Box>
     </SlideFade>
