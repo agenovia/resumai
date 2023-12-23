@@ -5,7 +5,10 @@ import {
   Input,
   InputGroup,
   InputRightElement,
+  Spinner,
   VStack,
+  Text,
+  CircularProgress,
 } from "@chakra-ui/react";
 import { BaseMessage } from "langchain/schema";
 import { useEffect, useState } from "react";
@@ -100,7 +103,6 @@ const ChatBox = ({ workHistory }: Props) => {
     setQuery("");
     setIsLoading(true);
   };
-
   return (
     <Center>
       <VStack>
@@ -111,6 +113,7 @@ const ChatBox = ({ workHistory }: Props) => {
           overflowY="auto"
           h="80vh"
           w="60vw"
+          scrollBehavior="smooth"
         >
           {chatHistory.map((message) => (
             <ChatMessage message={message} key={message.seq} />
@@ -122,7 +125,7 @@ const ChatBox = ({ workHistory }: Props) => {
             bgColor="gray.300"
             variant="outline"
             shadow="lg"
-            placeholder="Ask a question"
+            placeholder={isLoading ? "Thinking..." : "Ask a question"}
             onKeyUp={(e) => {
               if (e.key === "Enter") {
                 handleSend();
@@ -130,16 +133,26 @@ const ChatBox = ({ workHistory }: Props) => {
             }}
             onChange={(e) => setQuery(e.target.value)}
             value={query}
+            isDisabled={isLoading}
           />
           <InputRightElement>
-            <IconButton
-              aria-label="send-query"
-              title="Send Query"
-              icon={<LuSend />}
-              size="sm"
-              variant="ghost"
-              onClick={() => handleSend()}
-            />
+            {isLoading ? (
+              <CircularProgress
+                isIndeterminate
+                opacity={0.7}
+                color="black"
+                size="20px"
+              />
+            ) : (
+              <IconButton
+                aria-label="send-query"
+                title="Send Query"
+                icon={<LuSend />}
+                size="sm"
+                variant="ghost"
+                onClick={() => handleSend()}
+              />
+            )}
           </InputRightElement>
         </InputGroup>
       </VStack>
