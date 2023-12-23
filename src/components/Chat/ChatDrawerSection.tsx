@@ -47,7 +47,7 @@ const ChatDrawerSection = ({ selectedChatItem, handleCloseChat }: Props) => {
               boxShadow="dark-lg"
               rounded="full"
             />
-            <HStack m={4}>
+            <HStack m={4} justifyContent="space-between">
               <WorkTimelineCard workHistoryItem={selectedChatItem} />
               <ChatBox workHistory={selectedChatItem} />
             </HStack>
