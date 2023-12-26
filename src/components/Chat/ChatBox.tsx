@@ -8,7 +8,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { BaseMessage } from "langchain/schema";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LuSend } from "react-icons/lu";
 import PuffLoader from "react-spinners/PuffLoader";
 import useTimelineItemRetriever from "../../hooks/useTimelineItemRetriever";
@@ -24,6 +24,7 @@ const ChatBox = ({ workHistory }: Props) => {
   const [query, setQuery] = useState("");
   const { retriever } = useTimelineItemRetriever({ workHistory });
   const [isLoading, setIsLoading] = useState(false);
+  const chatWindowRef = useRef<HTMLDivElement>(null);
 
   const splashMessage = `Hi, I'm ResumAI. I'm here to help you dive deep into the client's \
   work history. Try asking questions like "Tell me more about your work at ${workHistory.company}"\
@@ -63,6 +64,7 @@ const ChatBox = ({ workHistory }: Props) => {
   }, []);
 
   useEffect(() => {
+    chatWindowRef.current?.scrollBy(0, chatWindowRef.current?.scrollHeight);
     if (chatHistory.length === 0) return;
     const lastMessage = chatHistory[chatHistory.length - 1];
     if (lastMessage.from === "system") return;
@@ -108,10 +110,10 @@ const ChatBox = ({ workHistory }: Props) => {
           borderRadius={10}
           bgColor="gray.200"
           shadow="lg"
-          overflowY="auto"
+          overflowY="scroll"
           h="80vh"
           w="60vw"
-          scrollBehavior="smooth"
+          ref={chatWindowRef}
         >
           {chatHistory.map((message) => (
             <ChatMessage message={message} key={message.seq} />
@@ -123,6 +125,7 @@ const ChatBox = ({ workHistory }: Props) => {
             bgColor="gray.300"
             variant="outline"
             shadow="lg"
+            title={isLoading ? "🤔" : "Ask a question"}
             placeholder={isLoading ? "Thinking..." : "Ask a question"}
             onKeyUp={(e) => {
               if (e.key === "Enter") {
