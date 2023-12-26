@@ -5,14 +5,12 @@ import {
   Input,
   InputGroup,
   InputRightElement,
-  Spinner,
   VStack,
-  Text,
-  CircularProgress,
 } from "@chakra-ui/react";
 import { BaseMessage } from "langchain/schema";
 import { useEffect, useState } from "react";
 import { LuSend } from "react-icons/lu";
+import PuffLoader from "react-spinners/PuffLoader";
 import useTimelineItemRetriever from "../../hooks/useTimelineItemRetriever";
 import WorkHistoryFormValues from "../WorkHistory/types";
 import ChatMessage from "./ChatMessage";
@@ -137,18 +135,17 @@ const ChatBox = ({ workHistory }: Props) => {
           />
           <InputRightElement>
             {isLoading ? (
-              <CircularProgress
-                isIndeterminate
-                opacity={0.7}
+              <PuffLoader
+                cssOverride={{ opacity: 0.5 }}
                 color="black"
-                size="20px"
+                size="25px"
               />
             ) : (
               <IconButton
                 aria-label="send-query"
                 title="Send Query"
                 icon={<LuSend />}
-                size="sm"
+                size="25px"
                 variant="ghost"
                 onClick={() => handleSend()}
               />

@@ -18,7 +18,7 @@ const ChatMessage = ({ message, isLoading }: Props) => {
     <Flex ms={isUser ? 10 : 0} me={isUser ? 0 : 10}>
       {!isLoading && isUser && <Spacer />}
       <Text
-        bgColor={!isLoading ? (isUser ? "green.300" : "teal.300") : "teal.300"}
+        bgColor={isLoading ? "teal.300" : isUser ? "green.300" : "teal.300"}
         m={2}
         p={4}
         pr={5}

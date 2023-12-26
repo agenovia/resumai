@@ -47,10 +47,6 @@ class TimelineItemRetriever extends OpenAIClient {
     ----------
     Refined answer:`
   );
-  questionAnsweringChain: RunnableSequence;
-  questionRefiningChain: RunnableSequence;
-  mainSequence: RunnableSequence;
-  retriever: ParentDocumentRetriever | undefined;
 
   constructor(workHistory: WorkHistoryFormValues) {
     super(import.meta.env.VITE_OPENAI_KEY);
@@ -61,58 +57,6 @@ class TimelineItemRetriever extends OpenAIClient {
       outputKey: "text", // The key for the final conversational output of the chain
       returnMessages: true, // If using with a chat model (e.g. gpt-3.5 or gpt-4)
     });
-    this.questionAnsweringChain = RunnableSequence.from([
-      {
-        // Pipe the question through unchanged
-        question: (input: { question: string }) => input.question,
-        memory: () => this.memory,
-        // Fetch the chat history, and return the history or null if not present
-        chatHistory: async () => {
-          const savedMemory = await this.memory.loadMemoryVariables({});
-          const hasHistory = savedMemory.chatHistory?.length > 0;
-          return hasHistory ? savedMemory.chatHistory : null;
-        },
-        chatHistorySerializer: () => this.serializeChatHistory,
-        slowChainSettings: () => {
-          return { llm: this.slowModel, prompt: this.slowChainPrompt };
-        },
-        fastChainSettings: () => {
-          return { llm: this.fastModel, prompt: this.fastChainPrompt };
-        },
-        context: async (input: { question: string }) =>
-          (await this.fetchParentDocumentRetriever()).getRelevantDocuments(
-            input.question
-          ),
-      },
-      this.performQuestionAnswering,
-    ]);
-    this.questionRefiningChain = RunnableSequence.from([
-      {
-        result: (input: {
-          originalQuestion: string;
-          result: string;
-          sourceDocuments: Array<Document>;
-        }) => input.result,
-        sourceDocuments: (input: {
-          originalQuestion: string;
-          result: string;
-          sourceDocuments: Array<Document>;
-        }) => input.sourceDocuments,
-        originalQuestion: (input: {
-          originalQuestion: string;
-          result: string;
-          sourceDocuments: Array<Document>;
-        }) => input.originalQuestion,
-        refineChainSettings: () => {
-          return { llm: this.fastModel, prompt: this.refineChainPrompt };
-        },
-      },
-      this.performAnswerRefining,
-    ]);
-    this.mainSequence = RunnableSequence.from([
-      this.questionAnsweringChain,
-      this.questionRefiningChain,
-    ]);
   }
 
   getDocuments = () => {
@@ -133,34 +77,35 @@ class TimelineItemRetriever extends OpenAIClient {
     );
   };
 
-  fetchParentDocumentRetriever = async () => {
-    if (!this.retriever) {
-      const vectorstore = new MemoryVectorStore(this.embeddings);
-      const childDocumentRetriever = ScoreThresholdRetriever.fromVectorStore(
-        vectorstore,
-        {
-          minSimilarityScore: 0.8,
-          maxK: 1, // Only return the top result
-          kIncrement: 200,
-          searchType: "similarity",
-        }
-      );
-      const docstore = new InMemoryStore();
-      const retriever = new ParentDocumentRetriever({
-        vectorstore,
-        childDocumentRetriever,
-        docstore,
-        childSplitter: new RecursiveCharacterTextSplitter({
-          chunkOverlap: 0,
-          chunkSize: 50,
-        }),
-        childK: 100,
-        parentK: 20,
-      });
-      await retriever.addDocuments(this.getDocuments());
-      return retriever;
-    }
-    return this.retriever;
+  fetchParentDocumentRetriever = async (filter?: Document) => {
+    const vectorstore = new MemoryVectorStore(this.embeddings);
+    const childDocumentRetriever = ScoreThresholdRetriever.fromVectorStore(
+      vectorstore,
+      {
+        minSimilarityScore: 0.8,
+        maxK: 1, // Only return the top result
+        kIncrement: 200,
+        searchType: "similarity",
+        filter(doc) {
+          if (!filter) return true;
+          return doc == filter;
+        },
+      }
+    );
+    const docstore = new InMemoryStore();
+    const retriever = new ParentDocumentRetriever({
+      vectorstore,
+      childDocumentRetriever,
+      docstore,
+      childSplitter: new RecursiveCharacterTextSplitter({
+        chunkOverlap: 0,
+        chunkSize: 50,
+      }),
+      childK: 100,
+      parentK: 20,
+    });
+    await retriever.addDocuments(this.getDocuments());
+    return retriever;
   };
 
   serializeChatHistory = async (chatHistory: Array<BaseMessage>) => {
@@ -197,11 +142,11 @@ class TimelineItemRetriever extends OpenAIClient {
       .flat()
       .join(", ");
     const serializedDocs = formatDocumentsAsString(input.context);
-    let fullContext;
+    let _context;
     if (skills.trim().length > 0) {
-      fullContext = `${serializedDocs}\nSkills: ${skills}`;
+      _context = `${serializedDocs}\nSkills: ${skills}`;
     } else {
-      fullContext = serializedDocs;
+      _context = serializedDocs;
     }
 
     const chatHistoryString = input.chatHistory
@@ -215,7 +160,7 @@ class TimelineItemRetriever extends OpenAIClient {
       // Call the faster chain to generate a new question
       const { text } = await fastChain.invoke({
         chatHistory: chatHistoryString,
-        context: fullContext,
+        context: _context,
         question: input.question,
       });
 
@@ -224,7 +169,7 @@ class TimelineItemRetriever extends OpenAIClient {
 
     const response = await slowChain.invoke({
       chatHistory: chatHistoryString ?? "",
-      context: fullContext,
+      context: _context,
       question: newQuestion,
     });
 
@@ -264,9 +209,61 @@ class TimelineItemRetriever extends OpenAIClient {
     };
   };
 
-  ask = async (question: string) => {
+  ask = async (question: string, filter?: Document) => {
+    const questionAnsweringChain = RunnableSequence.from([
+      {
+        // Pipe the question through unchanged
+        question: (input: { question: string }) => input.question,
+        memory: () => this.memory,
+        // Fetch the chat history, and return the history or null if not present
+        chatHistory: async () => {
+          const savedMemory = await this.memory.loadMemoryVariables({});
+          const hasHistory = savedMemory.chatHistory?.length > 0;
+          return hasHistory ? savedMemory.chatHistory : null;
+        },
+        chatHistorySerializer: () => this.serializeChatHistory,
+        slowChainSettings: () => {
+          return { llm: this.slowModel, prompt: this.slowChainPrompt };
+        },
+        fastChainSettings: () => {
+          return { llm: this.fastModel, prompt: this.fastChainPrompt };
+        },
+        context: async (input: { question: string }) =>
+          (
+            await this.fetchParentDocumentRetriever(filter)
+          ).getRelevantDocuments(input.question),
+      },
+      this.performQuestionAnswering,
+    ]);
+    const questionRefiningChain = RunnableSequence.from([
+      {
+        result: (input: {
+          originalQuestion: string;
+          result: string;
+          sourceDocuments: Array<Document>;
+        }) => input.result,
+        sourceDocuments: (input: {
+          originalQuestion: string;
+          result: string;
+          sourceDocuments: Array<Document>;
+        }) => input.sourceDocuments,
+        originalQuestion: (input: {
+          originalQuestion: string;
+          result: string;
+          sourceDocuments: Array<Document>;
+        }) => input.originalQuestion,
+        refineChainSettings: () => {
+          return { llm: this.fastModel, prompt: this.refineChainPrompt };
+        },
+      },
+      this.performAnswerRefining,
+    ]);
+    const mainSequence = RunnableSequence.from([
+      questionAnsweringChain,
+      questionRefiningChain,
+    ]);
     // const response = await this.questionAnsweringChain.invoke({ question });
-    const response = await this.mainSequence.invoke({ question });
+    const response = await mainSequence.invoke({ question });
     return response.result?.trim();
   };
 }
