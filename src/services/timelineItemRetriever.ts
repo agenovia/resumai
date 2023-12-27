@@ -1,52 +1,32 @@
 import { LLMChain, LLMChainInput } from "langchain/chains";
 import { Document } from "langchain/document";
 import { BufferMemory } from "langchain/memory";
-import { PromptTemplate } from "langchain/prompts";
 import { ParentDocumentRetriever } from "langchain/retrievers/parent_document";
 import { ScoreThresholdRetriever } from "langchain/retrievers/score_threshold";
 import { BaseMessage } from "langchain/schema";
-import { RunnableSequence } from "langchain/schema/runnable";
+import { RunnableBranch, RunnableSequence } from "langchain/schema/runnable";
 import { InMemoryStore } from "langchain/storage/in_memory";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { formatDocumentsAsString } from "langchain/util/document";
 import { MemoryVectorStore } from "langchain/vectorstores/memory";
 import WorkHistoryFormValues from "../components/WorkHistory/types";
 import OpenAIClient from "./openAIClient";
+import {
+  fastChainPrompt,
+  questionClassificationPrompt,
+  refineChainPrompt,
+  slowChainPrompt,
+} from "./prompts";
 
 class TimelineItemRetriever extends OpenAIClient {
   workHistory: WorkHistoryFormValues;
   vectorStore: MemoryVectorStore | null = null;
   documents: Document[] = [];
   memory: BufferMemory;
-  slowChainPrompt = PromptTemplate.fromTemplate(
-    `Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
-    ----------
-    CONTEXT: {context}
-    ----------
-    CHAT HISTORY: {chatHistory}
-    ----------
-    QUESTION: {question}
-    ----------
-    Helpful Answer:`
-  );
-  fastChainPrompt = PromptTemplate.fromTemplate(
-    `Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.
-    ----------
-    CHAT HISTORY: {chatHistory}
-    ----------
-    FOLLOWUP QUESTION: {question}
-    ----------
-    Standalone question:`
-  );
-  refineChainPrompt = PromptTemplate.fromTemplate(
-    `Given a previously generated AI response, human context and the original question, refine the response to be more accurate, gramatically correct, contextually relevant, and professional yet conversational. Avoid flowery language.
-    ----------
-    CONTEXT: {context}
-    ----------
-    RESPONSE: {response}
-    ----------
-    Refined answer:`
-  );
+  slowChainPrompt = slowChainPrompt;
+  fastChainPrompt = fastChainPrompt;
+  refineChainPrompt = refineChainPrompt;
+  questionClassificationPrompt = questionClassificationPrompt;
 
   constructor(workHistory: WorkHistoryFormValues) {
     super(import.meta.env.VITE_OPENAI_KEY);
@@ -209,8 +189,16 @@ class TimelineItemRetriever extends OpenAIClient {
     };
   };
 
-  ask = async (question: string, filter?: Document) => {
-    const questionAnsweringChain = RunnableSequence.from([
+  classifyQuestion = async (query: string) => {
+    const fewShotPrompt = await this.questionClassificationPrompt.format({
+      input: query,
+    });
+
+    return (await this.baseClient.invoke(fewShotPrompt)).trim();
+  };
+
+  ask = async (question: string) => {
+    const specificQAChain = RunnableSequence.from([
       {
         // Pipe the question through unchanged
         question: (input: { question: string }) => input.question,
@@ -229,12 +217,35 @@ class TimelineItemRetriever extends OpenAIClient {
           return { llm: this.fastModel, prompt: this.fastChainPrompt };
         },
         context: async (input: { question: string }) =>
-          (
-            await this.fetchParentDocumentRetriever(filter)
-          ).getRelevantDocuments(input.question),
+          (await this.fetchParentDocumentRetriever()).getRelevantDocuments(
+            input.question
+          ),
       },
       this.performQuestionAnswering,
     ]);
+    const generalQAChain = RunnableSequence.from([
+      {
+        // Pipe the question through unchanged
+        question: (input: { question: string }) => input.question,
+        memory: () => this.memory,
+        // Fetch the chat history, and return the history or null if not present
+        chatHistory: async () => {
+          const savedMemory = await this.memory.loadMemoryVariables({});
+          const hasHistory = savedMemory.chatHistory?.length > 0;
+          return hasHistory ? savedMemory.chatHistory : null;
+        },
+        chatHistorySerializer: () => this.serializeChatHistory,
+        slowChainSettings: () => {
+          return { llm: this.slowModel, prompt: this.slowChainPrompt };
+        },
+        fastChainSettings: () => {
+          return { llm: this.fastModel, prompt: this.fastChainPrompt };
+        },
+        context: () => this.getDocuments(),
+      },
+      this.performQuestionAnswering,
+    ]);
+
     const questionRefiningChain = RunnableSequence.from([
       {
         result: (input: {
@@ -258,12 +269,51 @@ class TimelineItemRetriever extends OpenAIClient {
       },
       this.performAnswerRefining,
     ]);
-    const mainSequence = RunnableSequence.from([
-      questionAnsweringChain,
+    // const questionClassificationChain = RunnableSequence.from([
+    //   {
+    //     // Pipe the question through unchanged
+    //     question: (input: { question: string }) => input.question,
+    //     memory: () => this.memory,
+    //     // Fetch the chat history, and return the history or null if not present
+    //     chatHistory: async () => {
+    //       const savedMemory = await this.memory.loadMemoryVariables({});
+    //       const hasHistory = savedMemory.chatHistory?.length > 0;
+    //       return hasHistory ? savedMemory.chatHistory : null;
+    //     },
+    //     chatHistorySerializer: () => this.serializeChatHistory,
+    //     context: () => this.getDocuments(),
+    //   },
+    //   this.performQuestionClassification,
+    // ]);
+    const specificQASequence = RunnableSequence.from([
+      specificQAChain,
       questionRefiningChain,
     ]);
+    const generalQASequence = RunnableSequence.from([
+      generalQAChain,
+      questionRefiningChain,
+    ]);
+
+    const qaBranch = RunnableBranch.from([
+      [
+        (x: { topic: string; question: string }) => x.topic === "specific",
+        specificQASequence,
+      ],
+      generalQASequence,
+    ]);
+
+    const fullChain = RunnableSequence.from([
+      {
+        topic: async (input: { question: string }) =>
+          await this.classifyQuestion(input.question),
+        question: (input: { question: string }) => input.question,
+      },
+      qaBranch,
+    ]);
+
     // const response = await this.questionAnsweringChain.invoke({ question });
-    const response = await mainSequence.invoke({ question });
+    // const response = await specificQASequence.invoke({ question });
+    const response = await fullChain.invoke({ question });
     return response.result?.trim();
   };
 }

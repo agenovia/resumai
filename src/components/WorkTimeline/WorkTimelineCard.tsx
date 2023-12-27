@@ -15,6 +15,7 @@ import {
 } from "@chakra-ui/react";
 import { FaBuilding, FaCommentDots, FaIdBadge } from "react-icons/fa6";
 
+import { useEffect, useState } from "react";
 import WorkHistoryFormValues from "../WorkHistory/types";
 import "./styles.css";
 
@@ -27,15 +28,36 @@ interface Props {
 }
 
 const WorkTimelineCard = ({ workHistoryItem, onChatClick }: Props) => {
-  const hasAccomplishments = workHistoryItem.accomplishments.length > 0;
-  const metadataFilter = {
-    company: workHistoryItem.company,
-    jobTitle: workHistoryItem.jobTitle,
-    startDate: workHistoryItem.startDate,
-    endDate: workHistoryItem.endDate,
-  };
+  const [hasAccomplishments, setHasAccomplishments] = useState(false);
+  const [hasSkills, setHasSkills] = useState(false);
+  const [topSkills, setTopSkills] = useState<[string, number][]>([]);
+
+  useEffect(() => {
+    const _hasAccomplishments = workHistoryItem.accomplishments.length > 0;
+    setHasAccomplishments(_hasAccomplishments);
+    const skills = workHistoryItem.accomplishments
+      ?.flatMap((v) => v.skills)
+      .flatMap((v) => v)
+      .map((v) => v.trim().toLowerCase())
+      .filter((v) => v.length > 0);
+    const _hasSkills = skills.length > 0;
+    setHasSkills(_hasSkills);
+    const _topSkills: { [key: string]: number } = {};
+    skills.forEach((v) =>
+      v in _topSkills
+        ? (_topSkills[v] = _topSkills[v] + 1)
+        : (_topSkills[v] = 1)
+    );
+    const _skillsArray: [string, number][] = [];
+    Object.keys(_topSkills).forEach(function (key) {
+      _skillsArray.push([key, _topSkills[key]]);
+    });
+    _skillsArray.sort((a, b) => b[1] - a[1]);
+    setTopSkills(_skillsArray.slice(0, 5));
+  }, []);
+
   return (
-    <Box className="main-card" overflowY="scroll">
+    <Box className="main-card" overflowY="scroll" overflowX="scroll">
       <Card>
         <VStack>
           <CardHeader>
@@ -78,9 +100,7 @@ const WorkTimelineCard = ({ workHistoryItem, onChatClick }: Props) => {
                         rounded="full"
                         bgColor="transparent"
                         icon={<FaCommentDots />}
-                        onClick={() =>
-                          onChatClick(workHistoryItem, metadataFilter)
-                        }
+                        onClick={() => onChatClick(workHistoryItem)}
                       />
                     </WrapItem>
                   )}
@@ -88,12 +108,7 @@ const WorkTimelineCard = ({ workHistoryItem, onChatClick }: Props) => {
               </HStack>
             </VStack>
           </CardHeader>
-          <CardBody
-            textAlign="left"
-            flexDirection="row"
-            w="inherit"
-            h="inherit"
-          >
+          <CardBody textAlign="left" flexDirection="row">
             <Heading className="headings" size="sm">
               <Text>Responsibilities</Text>
             </Heading>
@@ -114,6 +129,20 @@ const WorkTimelineCard = ({ workHistoryItem, onChatClick }: Props) => {
                     </Box>
                   ))}
                 </VStack>
+              </>
+            )}
+            {hasSkills && (
+              <>
+                <Heading className="headings" size="sm">
+                  <Text>Top Skills</Text>
+                </Heading>
+                <HStack>
+                  {topSkills.map((v, idx) => (
+                    <Badge key={idx} rounded="full" p={2}>
+                      {v[0]}
+                    </Badge>
+                  ))}
+                </HStack>
               </>
             )}
           </CardBody>

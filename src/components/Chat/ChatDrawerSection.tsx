@@ -29,11 +29,11 @@ const ChatDrawerSection = ({ selectedChatItem, handleCloseChat }: Props) => {
           variants: {
             enter: {
               x: "0%",
-              transition: { duration: 0.5 },
+              transition: { duration: 1.5 },
             },
             exit: {
               x: "0%",
-              transition: { duration: 1, ease: "easeInOut" },
+              transition: { duration: 1 },
             },
           },
         }}

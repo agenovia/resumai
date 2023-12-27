@@ -26,9 +26,10 @@ const ChatBox = ({ workHistory }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   const chatWindowRef = useRef<HTMLDivElement>(null);
 
-  const splashMessage = `Hi, I'm ResumAI. I'm here to help you dive deep into the client's \
-  work history. Try asking questions like "Tell me more about your work at ${workHistory.company}"\
-  or "Explain some of your accomplishments at ${workHistory.company}?"`;
+  const splashMessage = `Hi, I'm ResumAI. I have access to rich context on the client's work history \
+  that simply cannot be conveyed in a traditional resume, allowing me to dive deep into questions you \
+  might have regarding the client's fit and capacity. Try asking questions like "Tell me more about \
+  your work at ${workHistory.company}" or "Explain some of your accomplishments at ${workHistory.company}"`;
 
   useEffect(() => {
     const setChatFromMemory = async () => {
