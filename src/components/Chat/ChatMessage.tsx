@@ -45,7 +45,8 @@ const ChatMessage = ({ message, isLoading }: Props) => {
         {!isLoading && isUser && <Spacer />}
         <VStack>
           <Text
-            bgColor={isLoading ? "teal.300" : isUser ? "green.300" : "teal.300"}
+            // bgColor={isLoading ? "teal.300" : isUser ? "green.300" : "teal.300"}
+            bgColor={isLoading ? "orange" : isUser ? "dodgerblue" : "orange"}
             m={2}
             p={4}
             pr={5}

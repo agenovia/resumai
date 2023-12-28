@@ -4,7 +4,7 @@ import {
   PromptTemplate,
 } from "langchain/prompts";
 
-export const slowChainPrompt = PromptTemplate.fromTemplate(
+export const slowChainPrompt = ChatPromptTemplate.fromTemplate(
   `The context provided below is from your accomplishments; use it to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
     ----------
     CONTEXT: {context}
@@ -15,7 +15,7 @@ export const slowChainPrompt = PromptTemplate.fromTemplate(
     ----------
     Helpful Answer:`
 );
-export const fastChainPrompt = PromptTemplate.fromTemplate(
+export const fastChainPrompt = ChatPromptTemplate.fromTemplate(
   `Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question. If the context is inadequate, simply return the original question.
     ----------
     CHAT HISTORY: {chatHistory}
@@ -24,7 +24,7 @@ export const fastChainPrompt = PromptTemplate.fromTemplate(
     ----------
     Standalone question:`
 );
-export const refineChainPrompt = PromptTemplate.fromTemplate(
+export const refineChainPrompt = ChatPromptTemplate.fromTemplate(
   `Given a previously generated AI response and human context, refine the response to be more contextually accurate, gramatically correct, and professional. Emphasize readability by breaking a large paragraph into smaller paragraphs wherever appropriate. Avoid flowery language.
     ----------
     CONTEXT: {context}

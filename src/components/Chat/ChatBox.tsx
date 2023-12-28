@@ -30,17 +30,11 @@ const ChatBox = ({ workHistory }: Props) => {
   const splashMessage = `Hi, I'm ResumAI. I have access to rich context on the client's work history \
   that simply cannot be conveyed in a traditional resume, allowing me to dive deep into questions you \
   might have regarding the client's fit and capacity. Try asking questions like "Tell me about your \
-  experience leading a team.", "How have you leveraged your skills in data analysis to deliver a project?" \
+  experience leading a team", "How have you leveraged your skills in data analysis to deliver a project?" \
   or "Explain the challenges of [...]"`;
 
   useEffect(() => {
     const setChatFromMemory = async () => {
-      // const setChatFromMemory = await retriever?.memory.loadMemoryVariables({});
-      // return savedMemory
-      //   ? savedMemory.chatHistory?.length > 0
-      //     ? savedMemory.chatHistory
-      //     : null
-      //   : null;
       const savedMemory = await retriever?.memory.loadMemoryVariables({});
       const chatHistory = savedMemory?.chatHistory;
       if (chatHistory) {
