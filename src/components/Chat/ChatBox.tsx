@@ -15,6 +15,7 @@ import useTimelineItemRetriever from "../../hooks/useTimelineItemRetriever";
 import { Response } from "../../services/timelineItemRetriever";
 import WorkHistoryFormValues from "../WorkHistory/types";
 import ChatMessage from "./ChatMessage";
+import "./styles.css";
 
 interface Props {
   workHistory: WorkHistoryFormValues;
@@ -120,6 +121,7 @@ const ChatBox = ({ workHistory }: Props) => {
         </Box>
         <InputGroup>
           <Input
+            className={!isLoading ? "ripple" : ""}
             bgColor="gray.300"
             variant="outline"
             shadow="lg"

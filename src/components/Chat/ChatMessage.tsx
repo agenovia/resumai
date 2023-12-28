@@ -22,13 +22,11 @@ const ContextCards = ({ sourceDocuments }: ContextCard) => {
   if (!sourceDocuments || sourceDocuments.length === 0) return;
   return (
     <Box bgColor="blackAlpha.200" borderRadius={10} mt={4} p={4}>
-      <VStack align="left">
-        <Text as="b" opacity={0.6}>
-          Context sources:
-        </Text>
+      <VStack align="left" opacity={0.6}>
+        <Text as="b">Context sources:</Text>
         {sourceDocuments.length > 0 &&
           sourceDocuments.map((x, idx) => (
-            <Text size="4px" key={idx} opacity={0.6}>
+            <Text size="4px" key={idx}>
               - {x.metadata.headline}
             </Text>
           ))}
