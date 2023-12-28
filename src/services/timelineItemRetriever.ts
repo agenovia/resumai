@@ -18,6 +18,11 @@ import {
   slowChainPrompt,
 } from "./prompts";
 
+export interface Response {
+  result: string;
+  sourceDocuments: Array<Document>;
+}
+
 class TimelineItemRetriever extends OpenAIClient {
   workHistory: WorkHistoryFormValues;
   vectorStore: MemoryVectorStore | null = null;
@@ -189,15 +194,17 @@ class TimelineItemRetriever extends OpenAIClient {
     };
   };
 
-  classifyQuestion = async (query: string) => {
+  classifyQuestion = async (question: string) => {
     const fewShotPrompt = await this.questionClassificationPrompt.format({
-      input: query,
+      input: question,
     });
 
-    return (await this.baseClient.invoke(fewShotPrompt)).trim();
+    const response = (await this.baseClient.invoke(fewShotPrompt)).trim();
+    console.log(response);
+    return response;
   };
 
-  ask = async (question: string) => {
+  ask = async (question: string): Promise<Response> => {
     const specificQAChain = RunnableSequence.from([
       {
         // Pipe the question through unchanged
@@ -269,22 +276,6 @@ class TimelineItemRetriever extends OpenAIClient {
       },
       this.performAnswerRefining,
     ]);
-    // const questionClassificationChain = RunnableSequence.from([
-    //   {
-    //     // Pipe the question through unchanged
-    //     question: (input: { question: string }) => input.question,
-    //     memory: () => this.memory,
-    //     // Fetch the chat history, and return the history or null if not present
-    //     chatHistory: async () => {
-    //       const savedMemory = await this.memory.loadMemoryVariables({});
-    //       const hasHistory = savedMemory.chatHistory?.length > 0;
-    //       return hasHistory ? savedMemory.chatHistory : null;
-    //     },
-    //     chatHistorySerializer: () => this.serializeChatHistory,
-    //     context: () => this.getDocuments(),
-    //   },
-    //   this.performQuestionClassification,
-    // ]);
     const specificQASequence = RunnableSequence.from([
       specificQAChain,
       questionRefiningChain,
@@ -311,10 +302,8 @@ class TimelineItemRetriever extends OpenAIClient {
       qaBranch,
     ]);
 
-    // const response = await this.questionAnsweringChain.invoke({ question });
-    // const response = await specificQASequence.invoke({ question });
     const response = await fullChain.invoke({ question });
-    return response.result?.trim();
+    return response;
   };
 }
 

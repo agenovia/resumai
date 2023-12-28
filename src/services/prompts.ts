@@ -40,7 +40,7 @@ export const questionClassificationExamples = [
     output: "general",
   },
   {
-    input: "Tell me about the IT project your were involved in",
+    input: "Tell me about the database migration project your were involved in",
     output: "specific",
   },
   {
@@ -55,11 +55,21 @@ export const questionClassificationExamples = [
     input: "What challenges did you face when you implemented this feature?",
     output: "specific",
   },
+  {
+    input: "What experience do you have with project management?",
+    output: "general",
+  },
+  {
+    input: "What are your top skills?",
+    output: "general",
+  },
 ];
 
 export const questionClassificationPrompt =
   new FewShotChatMessagePromptTemplate({
-    prefix: `Classify the user's query into "general" or "specific"`,
+    prefix: `Classify the user's query into "general" or "specific". The broader the scope of the \
+    user's query, the more "general" it is; likewise, the more targetted the search terms, the \
+    more "specific" it is.`,
     suffix: "Human: {input}",
     examplePrompt: ChatPromptTemplate.fromTemplate(`{output}`),
     examples: questionClassificationExamples,

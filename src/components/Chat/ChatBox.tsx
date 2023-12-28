@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import { LuSend } from "react-icons/lu";
 import PuffLoader from "react-spinners/PuffLoader";
 import useTimelineItemRetriever from "../../hooks/useTimelineItemRetriever";
+import { Response } from "../../services/timelineItemRetriever";
 import WorkHistoryFormValues from "../WorkHistory/types";
 import ChatMessage from "./ChatMessage";
 
@@ -57,7 +58,7 @@ const ChatBox = ({ workHistory }: Props) => {
           }
         });
       } else {
-        handleSystemMessage(splashMessage);
+        handleSystemMessage({ result: splashMessage, sourceDocuments: [] });
       }
     };
     setChatFromMemory();
@@ -78,7 +79,8 @@ const ChatBox = ({ workHistory }: Props) => {
     getDocs();
   }, [chatHistory]);
 
-  const handleSystemMessage = (message: string) => {
+  const handleSystemMessage = (response: Response) => {
+    const message = response.result.trim();
     setChatHistory([
       ...chatHistory,
       {
@@ -88,6 +90,7 @@ const ChatBox = ({ workHistory }: Props) => {
             ? message
             : "I'm sorry, I don't understand, could you rephrase that?",
         seq: chatHistory.length + 1,
+        sourceDocuments: response.sourceDocuments,
       } as ChatMessage,
     ]);
     setIsLoading(false);
