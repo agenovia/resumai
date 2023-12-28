@@ -57,7 +57,6 @@ const ChatBox = ({ workHistory }: Props) => {
       }
     };
     setChatFromMemory();
-    // handleSystemMessage(splashMessage);
   }, []);
 
   useEffect(() => {

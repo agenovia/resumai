@@ -1,7 +1,6 @@
 import {
   ChatPromptTemplate,
   FewShotChatMessagePromptTemplate,
-  PromptTemplate,
 } from "langchain/prompts";
 
 export const slowChainPrompt = ChatPromptTemplate.fromTemplate(
