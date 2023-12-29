@@ -26,9 +26,12 @@ const ContextCards = ({ sourceDocuments }: ContextCard) => {
         <Text as="b">Context sources:</Text>
         {sourceDocuments.length > 0 &&
           sourceDocuments.map((x, idx) => (
-            <Text size="4px" key={idx}>
-              - {x.metadata.headline}
-            </Text>
+            <div key={idx}>
+              <Text fontSize="10px" as="sup" pr={1}>
+                {idx + 1}
+              </Text>
+              <Text as="span">{x.metadata.headline}</Text>
+            </div>
           ))}
       </VStack>
     </Box>
@@ -42,29 +45,30 @@ const ChatMessage = ({ message, isLoading }: Props) => {
       <Flex ms={isUser ? 10 : 0} me={isUser ? 0 : 10}>
         {!isLoading && isUser && <Spacer />}
         <VStack>
-          <Text
+          <Box
             bgColor={isLoading ? "orange" : isUser ? "dodgerblue" : "orange"}
             m={2}
             p={4}
             pr={5}
             shadow="sm"
-            borderRadius={10}
-            align="left"
             whiteSpace="pre-line"
+            rounded={isUser ? "full" : "lg"}
           >
-            {!isLoading ? (
-              message?.text ?? ""
-            ) : (
-              <BeatLoader
-                size="8px"
-                speedMultiplier={0.7}
-                cssOverride={{ opacity: 0.5 }}
-              />
-            )}
+            <Text align="left">
+              {!isLoading ? (
+                message?.text ?? ""
+              ) : (
+                <BeatLoader
+                  size="8px"
+                  speedMultiplier={0.7}
+                  cssOverride={{ opacity: 0.5 }}
+                />
+              )}
+            </Text>
             {!isLoading && (
               <ContextCards sourceDocuments={message?.sourceDocuments} />
             )}
-          </Text>
+          </Box>
         </VStack>
       </Flex>
     </>

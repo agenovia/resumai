@@ -24,7 +24,7 @@ const ChatDrawerSection = ({ selectedChatItem, handleCloseChat }: Props) => {
     >
       <DrawerOverlay />
       <DrawerContent
-        bgColor="whiteAlpha.800"
+        bgColor="whiteAlpha.900"
         motionProps={{
           variants: {
             enter: {
