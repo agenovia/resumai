@@ -137,11 +137,12 @@ const WorkTimelineItem = ({
               // w="100%"
               direction="row"
               shadow="md"
+              w="1000px"
               minW="400px"
               maxW="1000px"
               h="100%"
             >
-              <VStack spacing={2}>
+              <VStack w="980px" minW="380px" maxW="980px" spacing={2}>
                 <WorkTimelineCard
                   workHistoryItem={workHistoryItem}
                   onChatClick={onChatClick}
@@ -183,7 +184,14 @@ const WorkTimelineItem = ({
             <AlertDialogOverlay>
               <AlertDialogContent>
                 <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                  Delete Entry
+                  Delete entry{" "}
+                  <Text as="i" color="tomato">
+                    {workHistoryItem.jobTitle}
+                  </Text>{" "}
+                  at{" "}
+                  <Text as="i" color="tomato">
+                    {workHistoryItem.company}
+                  </Text>
                 </AlertDialogHeader>
                 <AlertDialogBody>
                   Deletion cannot be undone. Press Delete to confirm.

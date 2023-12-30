@@ -60,103 +60,104 @@ const WorkTimelineCard = ({ workHistoryItem, onChatClick }: Props) => {
 
   return (
     <Box
+      w="inherit"
       maxW="inherit"
       maxH="inherit"
       className="main-card"
       overflowY="scroll"
       overflowX="scroll"
     >
-      <Card>
-        <VStack>
-          <CardHeader>
-            <VStack spacing={2}>
-              <HStack spacing={2}>
-                <Wrap>
+      <Card w="inherit">
+        {/* <VStack> */}
+        <CardHeader>
+          <VStack spacing={2}>
+            <HStack spacing={2}>
+              <Wrap>
+                <WrapItem>
+                  <Badge
+                    fontSize="xs"
+                    variant="outline"
+                    bgColor="papayawhip"
+                    rounded="full"
+                    p={3}
+                  >
+                    <HStack>
+                      <Icon as={FaBuilding} />
+                      <Text>{workHistoryItem.company}</Text>
+                    </HStack>
+                  </Badge>
+                </WrapItem>
+                <WrapItem>
+                  <Badge
+                    fontSize="xs"
+                    variant="solid"
+                    bgColor="tomato"
+                    rounded="full"
+                    p={3}
+                  >
+                    <HStack>
+                      <Icon as={FaIdBadge} />
+                      <Text>{workHistoryItem.jobTitle}</Text>
+                    </HStack>
+                  </Badge>
+                </WrapItem>
+                {onChatClick && (
                   <WrapItem>
-                    <Badge
-                      fontSize="xs"
-                      variant="outline"
-                      bgColor="papayawhip"
+                    <IconButton
+                      aria-label="Chat about this job"
+                      title="Chat about this job"
                       rounded="full"
-                      p={3}
-                    >
-                      <HStack>
-                        <Icon as={FaBuilding} />
-                        <Text>{workHistoryItem.company}</Text>
-                      </HStack>
-                    </Badge>
+                      bgColor="transparent"
+                      icon={<FaCommentDots />}
+                      onClick={() => onChatClick(workHistoryItem)}
+                    />
                   </WrapItem>
-                  <WrapItem>
-                    <Badge
-                      fontSize="xs"
-                      variant="solid"
-                      bgColor="tomato"
-                      rounded="full"
-                      p={3}
-                    >
-                      <HStack>
-                        <Icon as={FaIdBadge} />
-                        <Text>{workHistoryItem.jobTitle}</Text>
-                      </HStack>
-                    </Badge>
-                  </WrapItem>
-                  {onChatClick && (
-                    <WrapItem>
-                      <IconButton
-                        aria-label="Chat about this job"
-                        title="Chat about this job"
-                        rounded="full"
-                        bgColor="transparent"
-                        icon={<FaCommentDots />}
-                        onClick={() => onChatClick(workHistoryItem)}
-                      />
-                    </WrapItem>
-                  )}
-                </Wrap>
-              </HStack>
-            </VStack>
-          </CardHeader>
-          <CardBody textAlign="left" flexDirection="row">
-            <Heading className="headings" size="sm">
-              <Text>Responsibilities</Text>
-            </Heading>
-            <VStack className="vertical-stack" spacing={2} align="left">
-              {workHistoryItem.description.map((v, idx) => (
-                <Text key={idx}>• {v.trim()}</Text>
-              ))}
-            </VStack>
-            {hasAccomplishments && (
-              <>
-                <Heading className="headings" size="sm">
-                  <Text>Accomplishments</Text>
-                </Heading>
-                <VStack className="vertical-stack" spacing={2} align="left">
-                  {workHistoryItem.accomplishments.map((v, idx) => (
-                    <Box key={idx} outlineColor="black" outline={2}>
-                      <Text>• {v.headline.trim()}</Text>
-                    </Box>
-                  ))}
-                </VStack>
-              </>
-            )}
-            {hasSkills && (
-              <>
-                <Heading className="headings" size="sm">
-                  <Text>Top Skills</Text>
-                </Heading>
-                <HStack>
-                  <Box>
-                    {topSkills.map((v, idx) => (
-                      <Badge key={idx} rounded="full" p={3} m={1}>
-                        {v[0]}
-                      </Badge>
-                    ))}
+                )}
+              </Wrap>
+            </HStack>
+          </VStack>
+        </CardHeader>
+        <CardBody textAlign="left" flexDirection="row">
+          <Heading className="headings" size="sm">
+            <Text>Responsibilities</Text>
+          </Heading>
+          <VStack className="vertical-stack" spacing={2} align="left">
+            {workHistoryItem.description.map((v, idx) => (
+              <Text key={idx}>• {v.trim()}</Text>
+            ))}
+          </VStack>
+          {hasAccomplishments && (
+            <>
+              <Heading className="headings" size="sm">
+                <Text>Accomplishments</Text>
+              </Heading>
+              <VStack className="vertical-stack" spacing={2} align="left">
+                {workHistoryItem.accomplishments.map((v, idx) => (
+                  <Box key={idx} outlineColor="black" outline={2}>
+                    <Text>• {v.headline.trim()}</Text>
                   </Box>
-                </HStack>
-              </>
-            )}
-          </CardBody>
-        </VStack>
+                ))}
+              </VStack>
+            </>
+          )}
+          {hasSkills && (
+            <>
+              <Heading className="headings" size="sm">
+                <Text>Top Skills</Text>
+              </Heading>
+              <HStack>
+                <Box>
+                  {topSkills.map((v, idx) => (
+                    <Badge key={idx} rounded="full" p={3} m={1}>
+                      {v[0]}
+                    </Badge>
+                  ))}
+                </Box>
+              </HStack>
+            </>
+          )}
+        </CardBody>
+        {/* </VStack> */}
       </Card>
     </Box>
   );
