@@ -212,15 +212,10 @@ class TimelineItemRetriever extends OpenAIClient {
     ]);
     this.qaChain = RunnableSequence.from([
       {
-        relevantDocuments: async (input: { question: string }) => {
-          const _selfQuery = await (
-            await this.fetchSelfQueryRetriever()
-          ).getRelevantDocuments(input.question);
-          const _parentDocument = await (
+        relevantDocuments: async (input: { question: string }) =>
+          await (
             await this.fetchParentDocumentRetriever()
-          ).getRelevantDocuments(input.question);
-          return _selfQuery.length > 0 ? _selfQuery : _parentDocument;
-        },
+          ).getRelevantDocuments(input.question),
         topic: async (input: { question: string }) =>
           await this.classifyQuestion(input.question),
         question: (input: { question: string }) => input.question,
