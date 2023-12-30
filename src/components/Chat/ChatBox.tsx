@@ -15,7 +15,7 @@ import useTimelineItemRetriever from "../../hooks/useTimelineItemRetriever";
 import { Response } from "../../services/timelineItemRetriever";
 import WorkHistoryFormValues from "../WorkHistory/types";
 import ChatMessage from "./ChatMessage";
-import "./styles.css";
+import "./animations.css";
 
 interface Props {
   workHistory: WorkHistoryFormValues;

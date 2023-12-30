@@ -53,11 +53,19 @@ const WorkTimelineCard = ({ workHistoryItem, onChatClick }: Props) => {
       _skillsArray.push([key, _topSkills[key]]);
     });
     _skillsArray.sort((a, b) => b[1] - a[1]);
-    setTopSkills(_skillsArray.slice(0, 5));
+    setTopSkills(
+      _skillsArray.slice(0, Math.max(Math.floor(_skillsArray.length / 3), 6))
+    );
   }, []);
 
   return (
-    <Box className="main-card" overflowY="scroll" overflowX="scroll">
+    <Box
+      maxW="inherit"
+      maxH="inherit"
+      className="main-card"
+      overflowY="scroll"
+      overflowX="scroll"
+    >
       <Card>
         <VStack>
           <CardHeader>
@@ -137,11 +145,13 @@ const WorkTimelineCard = ({ workHistoryItem, onChatClick }: Props) => {
                   <Text>Top Skills</Text>
                 </Heading>
                 <HStack>
-                  {topSkills.map((v, idx) => (
-                    <Badge key={idx} rounded="full" p={2}>
-                      {v[0]}
-                    </Badge>
-                  ))}
+                  <Box>
+                    {topSkills.map((v, idx) => (
+                      <Badge key={idx} rounded="full" p={3} m={1}>
+                        {v[0]}
+                      </Badge>
+                    ))}
+                  </Box>
                 </HStack>
               </>
             )}
