@@ -180,7 +180,7 @@ class TimelineItemRetriever extends OpenAIClient {
           sourceDocuments: Array<Document>;
         }) => input.originalQuestion,
         refineChainSettings: () => {
-          return { llm: this.fastModel, prompt: this.refineChainPrompt };
+          return { llm: this.slowModel, prompt: this.refineChainPrompt };
         },
       },
       this.performAnswerRefining,
@@ -233,7 +233,7 @@ class TimelineItemRetriever extends OpenAIClient {
     return this.workHistory.accomplishments.map(
       (a) =>
         new Document({
-          pageContent: a.context,
+          pageContent: `${a.headline}: ${a.context}`,
           metadata: {
             company: this.workHistory.company,
             jobTitle: this.workHistory.jobTitle,
@@ -266,7 +266,6 @@ class TimelineItemRetriever extends OpenAIClient {
       documentContents,
       attributeInfo,
       structuredQueryTranslator: new FunctionalTranslator(),
-      verbose: true,
     });
     return selfQueryRetriever;
   };
@@ -408,7 +407,6 @@ class TimelineItemRetriever extends OpenAIClient {
       input: question,
     });
     const response = (await this.baseModel.invoke(fewShotPrompt)).trim();
-    console.log(response);
     return response;
   };
 
