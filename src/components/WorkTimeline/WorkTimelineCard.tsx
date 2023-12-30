@@ -65,7 +65,6 @@ const WorkTimelineCard = ({ workHistoryItem, onChatClick }: Props) => {
       maxH="inherit"
       className="main-card"
       overflowY="scroll"
-      overflowX="scroll"
     >
       <Card w="inherit">
         {/* <VStack> */}

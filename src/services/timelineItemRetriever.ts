@@ -95,6 +95,18 @@ class TimelineItemRetriever extends OpenAIClient {
       input: "What are your top skills?",
       output: "general",
     },
+    {
+      input: "Tell me about your Java experience",
+      output: "general",
+    },
+    {
+      input: "What's your experience with Python?",
+      output: "general",
+    },
+    {
+      input: "How did you use C++ to solve a particular problem?",
+      output: "specific",
+    },
   ];
   questionClassificationPrompt = new FewShotChatMessagePromptTemplate({
     prefix: `Classify the user's query into "general" or "specific". The broader the scope of the \

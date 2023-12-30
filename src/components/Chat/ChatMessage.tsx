@@ -10,7 +10,7 @@ interface ChatMessage {
 }
 
 interface ContextCard {
-  sourceDocuments: Array<Document> | undefined;
+  sourceDocuments?: Array<Document>;
 }
 
 interface Props {
