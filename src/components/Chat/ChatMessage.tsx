@@ -27,7 +27,7 @@ const ContextCards = ({ sourceDocuments }: ContextCard) => {
         {sourceDocuments.length > 0 &&
           sourceDocuments.map((x, idx) => (
             <div key={idx}>
-              <Text fontSize="10px" as="sup" pr={1}>
+              <Text fontSize="8px" as="sup" pr={1}>
                 {idx + 1}
               </Text>
               <Text as="span">{x.metadata.headline}</Text>
