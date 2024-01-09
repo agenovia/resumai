@@ -12,7 +12,6 @@ const AddWorkHistoryButton = ({ onAddWorkHistory }: Props) => {
       title="Add Work History"
       icon={<MdOutlineAdd />}
       onClick={onAddWorkHistory}
-      m={4}
       p={6}
       bgColor="palegreen"
       color="black"

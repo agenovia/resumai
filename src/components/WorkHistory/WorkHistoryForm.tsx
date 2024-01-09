@@ -12,6 +12,7 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  Stack,
   Text,
   Textarea,
 } from "@chakra-ui/react";
@@ -117,12 +118,6 @@ const WorkHistoryForm = ({
                   description: (data.description as unknown as string)
                     .split(/(?:(?:(?<!=\w)-(?!\w))|\n|•|○|⦿|⦾|‣|⁃)/)
                     .filter((x) => x.trim().length > 0),
-                  // accomplishments: data.accomplishments.map((v) => ({
-                  //   ...v,
-                  //   skills: (v.skills as unknown as string)
-                  //     .split(/(?:,|;)/)
-                  //     .filter((x) => x.trim().length > 0),
-                  // })),
                 };
                 onSubmit(_data, replaceIndex);
               })}
@@ -142,7 +137,7 @@ const WorkHistoryForm = ({
                 />
               </FormControl>
 
-              <HStack mb={4}>
+              <Stack mb={4} direction={{ base: "column", md: "row" }}>
                 <FormControl isRequired={true}>
                   <FormLabel>Start Date</FormLabel>
                   <Input
@@ -166,17 +161,17 @@ const WorkHistoryForm = ({
                 </FormControl>
                 <FormControl>
                   <Checkbox
-                    mt={5}
                     isChecked={isCurrentJob}
                     onChange={() => {
                       setCurrentJob(!isCurrentJob);
                       setEndDate("");
                     }}
+                    mt={["0px", "0px", "40px", "40px"]}
                   >
                     <Text fontSize="14px">I currently work here</Text>
                   </Checkbox>
                 </FormControl>
-              </HStack>
+              </Stack>
               <FormControl isRequired={true} mb={4}>
                 <FormLabel>Responsibilities</FormLabel>
                 <Textarea
@@ -207,7 +202,10 @@ const WorkHistoryForm = ({
                 />
               </FormControl>
               <FormControl mb={4}>
-                <HStack justifyContent="space-between">
+                <Stack
+                  justifyContent="space-between"
+                  direction={{ base: "column", sm: "row" }}
+                >
                   {replaceIndex !== undefined ? (
                     <Button
                       colorScheme="orange"
@@ -221,11 +219,16 @@ const WorkHistoryForm = ({
                       colorScheme="green"
                       isLoading={isSubmitting}
                       type="submit"
+                      textOverflow="wrap"
                     >
                       Submit New Entry
                     </Button>
                   )}
-                  <HStack spacing="14px">
+                  <HStack
+                    spacing="14px"
+                    justifyContent="space-between"
+                    pt={[8, 0]}
+                  >
                     {replaceIndex !== undefined ? (
                       <Button colorScheme="red" onClick={handleClose}>
                         Discard Changes
@@ -241,7 +244,7 @@ const WorkHistoryForm = ({
                       </>
                     )}
                   </HStack>
-                </HStack>
+                </Stack>
               </FormControl>
             </form>
           </Box>

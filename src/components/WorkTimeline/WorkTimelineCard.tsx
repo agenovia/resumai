@@ -103,6 +103,7 @@ const WorkTimelineCard = ({ workHistoryItem, onChatClick }: Props) => {
                 {onChatClick && (
                   <WrapItem>
                     <IconButton
+                      className="ripple"
                       aria-label="Chat about this job"
                       title="Chat about this job"
                       rounded="full"

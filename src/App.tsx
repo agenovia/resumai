@@ -1,4 +1,4 @@
-import { Flex, VStack } from "@chakra-ui/react";
+import { Flex, Grid, GridItem } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import "./App.css";
 import ChatDrawerSection from "./components/Chat/ChatDrawerSection";
@@ -93,7 +93,18 @@ function App() {
   }, []);
 
   return (
-    <VStack spacing="24px">
+    <Grid
+      templateAreas={{
+        lg: `"aside header aside"
+             "aside main aside"
+             `,
+        md: `"header header header"
+             "main main main"
+             `,
+      }}
+      templateRows={`"100px 1fr"`}
+      templateColumns={{ lg: `"100px 1fr 100px"`, md: `"0.1fr"` }}
+    >
       <WorkHistoryForm
         isOpen={modalOpen}
         onClose={handleCloseForm}
@@ -101,25 +112,29 @@ function App() {
         workHistory={selectedEditHistory}
         replaceIndex={replaceIndex}
       />
-      <AddWorkHistoryButton onAddWorkHistory={handleAddNewEntry} />
-      <Flex direction="column" align="left" m={4} pl={10} pr={10}>
-        {workHistory.map((item, idx) => (
-          <WorkTimelineItem
-            expanded={false}
-            key={idx}
-            index={idx}
-            workHistoryItem={item}
-            onChatClick={handleOpenChat}
-            onDelete={handleDeleteEntry}
-            onEdit={handleEditEntry}
-          />
-        ))}
-      </Flex>
+      <GridItem area={"header"}>
+        <AddWorkHistoryButton onAddWorkHistory={handleAddNewEntry} />
+      </GridItem>
+      <GridItem area={"main"} pt={["100px", "80px", "50px", 0]}>
+        <Flex direction="column">
+          {workHistory.map((item, idx) => (
+            <WorkTimelineItem
+              expanded={false}
+              key={idx}
+              index={idx}
+              workHistoryItem={item}
+              onChatClick={handleOpenChat}
+              onDelete={handleDeleteEntry}
+              onEdit={handleEditEntry}
+            />
+          ))}
+        </Flex>
+      </GridItem>
       <ChatDrawerSection
         selectedChatItem={selectedChatItem}
         handleCloseChat={handleCloseChat}
       />
-    </VStack>
+    </Grid>
   );
 }
 
