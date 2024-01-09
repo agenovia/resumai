@@ -137,14 +137,13 @@ const WorkHistoryForm = ({
                 />
               </FormControl>
 
-              <Stack mb={4} direction={{ base: "column", md: "row" }}>
+              <Stack mb={5} direction={{ base: "column", md: "row" }}>
                 <FormControl isRequired={true}>
                   <FormLabel>Start Date</FormLabel>
                   <Input
                     id="startDate"
                     {...register("startDate", { required: true })}
                     type="date"
-                    mb={2}
                   />
                 </FormControl>
                 <FormControl isRequired={!isCurrentJob}>
@@ -154,7 +153,6 @@ const WorkHistoryForm = ({
                     {...register("endDate", { required: !isCurrentJob })}
                     type="date"
                     isDisabled={isCurrentJob}
-                    mb={2}
                     onChange={(event) => setEndDate(event.target.value)}
                     value={currentEndDate}
                   />
